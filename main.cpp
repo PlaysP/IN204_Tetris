@@ -1,12 +1,18 @@
 #include<iostream>
 #include<raylib.h>
+#include "grid.hpp"
 
 int main(void)
 {
+    Grid grid;
+    grid.print();
+
     // Initialization
     //--------------------------------------------------------------------------------------
     const int screenWidth = 300;
     const int screenHeight = 600;
+    const int tileSize = 30;
+    // 1 case : 30x30 pixels
 
     InitWindow(screenWidth, screenHeight, "Tetris");
 
@@ -25,9 +31,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(RAYWHITE);
-
-            DrawText("Coucou", 190, 200, 20, LIGHTGRAY);
+            grid.draw(tileSize);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
