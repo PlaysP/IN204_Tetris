@@ -3,16 +3,14 @@
 #include <vector>
 #include <iostream>
 #include "raylib.h"
+#include "draw.hpp"
 
-Color charToColor(char c) {
-    if (c=='r') return RED;
-    if (c=='y') return GOLD;
-    if (c=='b') return BLUE;
-    if (c=='g') return LIME;
-    if (c=='o') return ORANGE;
-    if (c=='v') return VIOLET;
-    return BEIGE;
-}
+class tetromino; // forward declaration to avoid circular include
+
+Color charToColor(char c);
+
+// Declare utility that depends on `tetromino` (defined in grid.cpp)
+char TetrominoToChar(tetromino &t);
 
 // Grid size: 20 x 10
 // i - component : screenHeight, nb of rows [0, 19]
@@ -46,10 +44,10 @@ public:
             m_grid[i][jMax-1] = 1;
         }
 
-        test :
-        for (int j = 0; j<jMax; j++) m_grid[6][j]='r';
-        m_grid[5][4]='y';
-        m_grid[7][6]='y';
+        // test :
+        // for (int j = 0; j<jMax; j++) m_grid[6][j]='r';
+        // m_grid[5][4]='y';
+        // m_grid[7][6]='y';
     }
     Grid(const Grid& aGrid): m_grid(aGrid.m_grid) {};
 
@@ -101,7 +99,7 @@ public:
             for (int j = 1; j < jMax-1; j++) {
                 if (m_grid[i][j] != 0) {
                     Color color = charToColor(m_grid[i][j]);
-                    DrawRectangleGradientH((j-1)*tileSize, (i-1)*tileSize, tileSize, tileSize, color, ColorBrightness(color, -0.3f));
+                    drawSquare(i,j,tileSize,color);
                 }
             }
         }
@@ -110,4 +108,6 @@ public:
     char getCell(int i, int j) const {
         return m_grid[i][j];
     }
+
+    void placeTetromino(tetromino &t, int tileSize);
 };

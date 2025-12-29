@@ -1,3 +1,5 @@
+#pragma once
+
 class Timer 
 {
     // A one-shot timer
@@ -40,6 +42,11 @@ public:
             return true;
         }
         return false;
+    }
+
+    void SkipToNextTrigger()
+    {
+        time = interval;
     }
 };
 

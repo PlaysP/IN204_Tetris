@@ -37,11 +37,19 @@ int main(void)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         fallTimer.Update();
-        if (fallTimer.Trigger()){grounded = t.fall(tileSize,grid);} // Make the tetromino fall every second
+        if (fallTimer.Trigger()) {
+            grounded = t.fall(tileSize,grid);
+            if (grounded) {
+                grid.placeTetromino(t,tileSize);
+                grid.removeFilledRows();
+                t = tetromino('O', Vector(6,8));
+            }
+        } // Make the tetromino fall every second
         std::cout<<pred_pressed<<"\n";
         if(IsKeyDown(KEY_RIGHT) && !pred_pressed){t.moveRight(tileSize,grid);}
         if(IsKeyDown(KEY_LEFT) && !pred_pressed){t.moveLeft(tileSize,grid);}
-        pred_pressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT);
+        if(IsKeyDown(KEY_DOWN) && !pred_pressed){fallTimer.SkipToNextTrigger();}
+        pred_pressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_DOWN);
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
