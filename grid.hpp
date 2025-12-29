@@ -106,4 +106,8 @@ public:
             }
         }
     }
+
+    char getCell(int i, int j) const {
+        return m_grid[i][j];
+    }
 };
