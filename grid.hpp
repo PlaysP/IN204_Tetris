@@ -4,21 +4,17 @@
 #include <iostream>
 #include "raylib.h"
 #include "draw.hpp"
+#include "constant.hpp"
 
 class tetromino; // forward declaration to avoid circular include
-
-Color charToColor(char c);
-
-// Declare utility that depends on `tetromino` (defined in grid.cpp)
-char TetrominoToChar(tetromino &t);
 
 // Grid size: 20 x 10
 // i - component : screenHeight, nb of rows [0, 19]
 // j - component: screenWidth, nb of colomns [0, 9]
 class Grid {
 private:
-    int nbRow = 20;
-    int nbCol = 10;
+    int nbRow = NB_ROWS;
+    int nbCol = NB_COLS;
 
     // jMax takes into account lateral borders and iMax inferior border and the top row where tetrominos spawn
     int iMax = nbRow+2;
@@ -43,11 +39,6 @@ public:
             m_grid[i][0] = 1;
             m_grid[i][jMax-1] = 1;
         }
-
-        // test :
-        // for (int j = 0; j<jMax; j++) m_grid[6][j]='r';
-        // m_grid[5][4]='y';
-        // m_grid[7][6]='y';
     }
     Grid(const Grid& aGrid): m_grid(aGrid.m_grid) {};
 
@@ -86,12 +77,12 @@ public:
         }
     }
 
-    void draw(int tileSize) {
+    void draw() {
         // Background grid pattern
         ClearBackground(BLACK);
         for (int i=0; i<iMax-1; i++) {
             for (int j=0; j<jMax-1; j++) {
-                DrawRectangleLines(j*tileSize, i*tileSize, tileSize, tileSize, DARKGRAY);
+                DrawRectangleLines(j*TILE_SIZE, i*TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);
             }
         }
 
@@ -99,7 +90,7 @@ public:
             for (int j = 1; j < jMax-1; j++) {
                 if (m_grid[i][j] != 0) {
                     Color color = charToColor(m_grid[i][j]);
-                    drawSquare(i,j,tileSize,color);
+                    drawSquare(i,j,TILE_SIZE,color);
                 }
             }
         }
@@ -109,5 +100,5 @@ public:
         return m_grid[i][j];
     }
 
-    void placeTetromino(tetromino &t, int tileSize);
+    void placeTetromino(tetromino &t);
 };

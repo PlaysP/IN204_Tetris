@@ -12,17 +12,17 @@ int main(void)
 
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 300;
-    const int screenHeight = 600;
-    const int tileSize = 30;
+    // const int screenWidth = 300;
+    // const int screenHeight = 600;
+    // const int tileSize = 30;
 
     bool grounded = false;
     bool pred_pressed = false;
-    tetromino t = tetromino('O', Vector(6,8));
+    tetromino_T t;
     RepeatingTimer fallTimer(1.0f);
 
     // 1 case : 30x30 pixels
-    InitWindow(screenWidth, screenHeight, "Tetris");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tetris");
 
     if (!IsWindowReady()) {
         std::cerr << "Failed to initialize window (display unavailable). Exiting." << std::endl;
@@ -33,30 +33,28 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    std::cout << "Truc\n";
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         fallTimer.Update();
         if (fallTimer.Trigger()) {
-            grounded = t.fall(tileSize,grid);
+            grounded = t.fall(grid);
             if (grounded) {
-                grid.placeTetromino(t,tileSize);
+                grid.placeTetromino(t);
                 grid.removeFilledRows();
-                t = tetromino('O', Vector(6,8));
+                t = tetromino_T();
             }
         } // Make the tetromino fall every second
-        std::cout<<pred_pressed<<"\n";
-        if(IsKeyDown(KEY_RIGHT) && !pred_pressed){t.moveRight(tileSize,grid);}
-        if(IsKeyDown(KEY_LEFT) && !pred_pressed){t.moveLeft(tileSize,grid);}
+        if(IsKeyDown(KEY_RIGHT) && !pred_pressed){t.moveRight(grid);}
+        if(IsKeyDown(KEY_LEFT) && !pred_pressed){t.moveLeft(grid);}
         if(IsKeyDown(KEY_DOWN) && !pred_pressed){fallTimer.SkipToNextTrigger();}
-        pred_pressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_DOWN);
+        if(IsKeyDown(KEY_UP) && !pred_pressed){t.rotateClockwise(grid);}
+        pred_pressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_UP);
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            grid.draw(tileSize);
-            t.draw(tileSize);
-
+            grid.draw();
+            t.draw();
 
         EndDrawing();
         //----------------------------------------------------------------------------------
