@@ -9,8 +9,8 @@
 class tetromino; // forward declaration to avoid circular include
 
 // Grid size: 20 x 10
-// i - component : screenHeight, nb of rows [0, 19]
-// j - component: screenWidth, nb of colomns [0, 9]
+// i - component : screenHeight, playable rows [1, 20]
+// j - component: screenWidth, playable colomns [1, 10]
 class Grid {
 private:
     int nbRow = NB_ROWS;
@@ -101,4 +101,13 @@ public:
     }
 
     void placeTetromino(tetromino &t);
+
+    bool GameOver() {
+        for (int j = 1; j < jMax-1; j++) {
+            if (m_grid[1][j] != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 };

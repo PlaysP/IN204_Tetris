@@ -17,7 +17,13 @@ int main(void)
     // const int tileSize = 30;
 
     bool grounded = false;
-    bool pred_pressed = false;
+
+    KeyPressTimer keyRight(0.2f, KEY_RIGHT);
+    KeyPressTimer keyLeft(0.2f, KEY_LEFT);
+    KeyPressTimer keyDown(0.2f, KEY_DOWN);
+    KeyPressTimer keyUp(0.2f, KEY_UP);
+    KeyPressTimer keySpace(0.2f, KEY_SPACE);
+
     tetromino_T t;
     RepeatingTimer fallTimer(1.0f);
 
@@ -28,27 +34,57 @@ int main(void)
         std::cerr << "Failed to initialize window (display unavailable). Exiting." << std::endl;
         return 1;
     }
+    printf("Window initialized successfully.\n");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
+
+    bool gameOver = false;
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+    if (gameOver) {
+        BeginDrawing();
+        drawGameOver();
+        EndDrawing();
+
+        if (keySpace.IsPressedAndReady()) {
+            // Reset game
+            grid.reset();
+            t = tetromino_T();
+            grounded = false;
+            gameOver = false;
+        }
+        keySpace.Update();
+
+    } else {
         fallTimer.Update();
         if (fallTimer.Trigger()) {
             grounded = t.fall(grid);
             if (grounded) {
                 grid.placeTetromino(t);
                 grid.removeFilledRows();
+
+                // Check for game over (after removing filled rows !)
+                if (grid.GameOver()){
+                    gameOver = true;
+                    continue;
+                }
+                
+                // New tetromino
                 t = tetromino_T();
             }
         } // Make the tetromino fall every second
-        if(IsKeyDown(KEY_RIGHT) && !pred_pressed){t.moveRight(grid);}
-        if(IsKeyDown(KEY_LEFT) && !pred_pressed){t.moveLeft(grid);}
-        if(IsKeyDown(KEY_DOWN) && !pred_pressed){fallTimer.SkipToNextTrigger();}
-        if(IsKeyDown(KEY_UP) && !pred_pressed){t.rotateClockwise(grid);}
-        pred_pressed = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_UP);
+        if(keyRight.IsPressedAndReady()){t.moveRight(grid);}
+        if(keyLeft.IsPressedAndReady()){t.moveLeft(grid);}
+        if(keyDown.IsPressedAndReady()){fallTimer.SkipToNextTrigger();}
+        if(keyUp.IsPressedAndReady()){t.rotateClockwise(grid);}
+
+        keyDown.Update();
+        keyLeft.Update();
+        keyRight.Update();
+        keyUp.Update();
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
@@ -59,11 +95,13 @@ int main(void)
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
+    }
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
+    
 
     return 0;
 } 

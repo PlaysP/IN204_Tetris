@@ -45,7 +45,7 @@ public:
     }
 };                   
 
-// the position of the teromino is stored in (i,j) grid cell coordinates of the top left corner of its bounding box
+// the position of the tetromino is stored in (i,j) grid cell coordinates of the top left corner of its bounding box
 class tetromino {
 private:
     Position position;
