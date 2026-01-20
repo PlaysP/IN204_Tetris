@@ -64,9 +64,11 @@ public:
         }
     }
 
-    void removeFilledRows() {
+    int removeFilledRows() {
+        int rowsRemoved = 0;
         for (int i = 1; i < iMax-1; i++) {
             if (isFilled(m_grid[i])) {
+                rowsRemoved++;
                 std::vector<std::vector<char>>::const_iterator begin = m_grid.begin();
                 m_grid.erase(begin + i);
                 std::vector<char> newRow(jMax,0);
@@ -75,6 +77,7 @@ public:
                 m_grid.insert(begin+1,newRow);
             }
         }
+        return rowsRemoved;
     }
 
     void draw() {

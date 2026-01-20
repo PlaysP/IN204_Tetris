@@ -30,6 +30,11 @@ public:
         time = 0.0f;
     }
 
+    void SetInterval(float newInterval)
+    {
+        interval = newInterval;
+    }
+
 };
 
 class RepeatingTimer : public Timer
