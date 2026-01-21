@@ -23,12 +23,6 @@ int main(void)
     Grid grid;
     grid.print();
 
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    // const int screenWidth = 300;
-    // const int screenHeight = 600;
-    // const int tileSize = 30;
-
     bool grounded = false;
     int score = 0;
     int level = 0;
@@ -39,11 +33,11 @@ int main(void)
     futureTetrominos.push(randomTetromino());
     futureTetrominos.push(randomTetromino());
 
-    KeyPressTimer keyRight(0.2f, KEY_RIGHT);
-    KeyPressTimer keyLeft(0.2f, KEY_LEFT);
-    KeyPressTimer keyDown(0.2f, KEY_DOWN);
-    KeyPressTimer keyUp(0.2f, KEY_UP);
-    KeyPressTimer keySpace(0.2f, KEY_SPACE);
+    KeyPressTimer keyRight(0.12f, KEY_RIGHT);
+    KeyPressTimer keyLeft(0.12f, KEY_LEFT);
+    KeyPressTimer keyDown(0.12f, KEY_DOWN);
+    KeyPressTimer keyUp(0.20f, KEY_UP);
+    KeyPressTimer keySpace(0.12f, KEY_SPACE);
 
     tetromino t = tetromino(futureTetrominos.front());
     futureTetrominos.pop();
@@ -78,6 +72,10 @@ int main(void)
             t = tetromino(futureTetrominos.front());
             grounded = false;
             gameOver = false;
+            score = 0;
+            level = 0;
+            rowsRemovedCounter = 0;
+            fallTimer.SetInterval(speed[level]);
         }
         keySpace.Update();
 
@@ -119,6 +117,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
+            drawBackground(score, level, futureTetrominos);
             grid.draw();
             t.draw();
 

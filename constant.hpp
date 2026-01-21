@@ -4,8 +4,14 @@
 #define TILE_SIZE 30
 #define NB_COLS 10
 #define NB_ROWS 20
-#define SCREEN_WIDTH (TILE_SIZE * NB_COLS)
-#define SCREEN_HEIGHT (TILE_SIZE * NB_ROWS)
+#define GRID_WIDTH (TILE_SIZE * NB_COLS)
+#define GRID_HEIGHT (TILE_SIZE * NB_ROWS)
+
+#define GRID_X_OFFSET 30
+#define GRID_Y_OFFSET 30
+
+#define SCREEN_WIDTH (GRID_WIDTH + 2* GRID_X_OFFSET + 150)
+#define SCREEN_HEIGHT (GRID_HEIGHT + 2* GRID_Y_OFFSET)
 
 inline Color charToColor(char c) {
     if (c=='r') return RED;

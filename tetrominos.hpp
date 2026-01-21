@@ -1,9 +1,10 @@
 #pragma once
 #include "raylib.h"
-#include "grid.hpp"
 #include "constant.hpp"
 #include <map>
 #include <stdio.h>
+
+class Grid; // forward declaration
 
 class Position {
 public:
@@ -58,54 +59,55 @@ public:
     // tetromino(Position pos, char shape) : position(pos), rotationState(0), shape(shape) {}
     tetromino(char aShape): shape(aShape) {
         switch(aShape) {
-        case 'T':
+        case 'T': 
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,1), Position(1,0), Position(1,1), Position(1,2)};
             cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,1)};
             cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,1)};
             cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,1)};
+            break;
         case 'O':
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(0,1), Position(1,0), Position(1,1)};
-
+            break;
         case 'I':
             position = Position(0, NB_COLS / 2 - 1);
             cells[0] = {Position(1,0), Position(1,1), Position(1,2), Position(1,3)};
             cells[1] = {Position(0,2), Position(1,2), Position(2,2), Position(3,2)};
             cells[2] = {Position(2,0), Position(2,1), Position(2,2), Position(2,3)};
             cells[3] = {Position(0,1), Position(1,1), Position(2,1), Position(3,1)};
-
+            break;
         case 'J':
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(1,0), Position(1,1), Position(1,2)};
             cells[1] = {Position(0,1), Position(0,2), Position(1,1), Position(2,1)};
             cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,2)};
             cells[3] = {Position(0,1), Position(1,1), Position(2,0), Position(2,1)};
-
+            break;
         case 'L':
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,2), Position(1,0), Position(1,1), Position(1,2)};
             cells[1] = {Position(0,1), Position(1,1), Position(2,1), Position(2,2)};
             cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,0)};
             cells[3] = {Position(0,0), Position(0,1), Position(1,1), Position(2,1)};
-
+            break;
         case 'S':
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,1), Position(0,2), Position(1,0), Position(1,1)};
             cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,2)};
             cells[2] = {Position(1,1), Position(1,2), Position(2,0), Position(2,1)};
             cells[3] = {Position(0,0), Position(1,0), Position(1,1), Position(2,1)};
-
+            break;
         case 'Z':
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(0,1), Position(1,1), Position(1,2)};
             cells[1] = {Position(0,2), Position(1,1), Position(1,2), Position(2,1)};
             cells[2] = {Position(1,0), Position(1,1), Position(2,1), Position(2,2)};
             cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,0)};
-
+            break;
         default: // 'O' as default
             position = Position(0, NB_COLS / 2);
-            cells[0] = {Position(0,1), Position(1,0), Position(1,1), Position(1,2)};
+            cells[0] = {Position(0,0), Position(0,1), Position(1,0), Position(1,1)};
         }
     }
 
@@ -177,12 +179,21 @@ public:
         }
     }
 
-    void draw() {
-        std::vector<Position> currentCells = cells[rotationState];
-        for (const auto& cell : currentCells) {
-            int i = position.i + cell.i;
-            int j = position.j + cell.j;
-            drawSquare(i, j, TILE_SIZE, charToColor(shapeToChar(shape)));
+    void draw(); // Forward declaration, implementation after includes
+};
+
+// Include after class definition to avoid circular includes
+#include "draw.hpp"
+#include "grid.hpp"
+
+// Implementation of draw() after all includes
+inline void tetromino::draw() {
+    std::vector<Position> currentCells = cells[rotationState];
+    for (const auto& cell : currentCells) {
+        int i = position.i + cell.i;
+        int j = position.j + cell.j;
+        if (i > 0) { // do not draw above the grid
+            drawSquareInGrid(i, j, charToColor(shapeToChar(shape)));
         }
     }
-};
+}

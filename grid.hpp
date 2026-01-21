@@ -3,7 +3,6 @@
 #include <vector>
 #include <iostream>
 #include "raylib.h"
-#include "draw.hpp"
 #include "constant.hpp"
 
 class tetromino; // forward declaration to avoid circular include
@@ -80,24 +79,7 @@ public:
         return rowsRemoved;
     }
 
-    void draw() {
-        // Background grid pattern
-        ClearBackground(BLACK);
-        for (int i=0; i<iMax-1; i++) {
-            for (int j=0; j<jMax-1; j++) {
-                DrawRectangleLines(j*TILE_SIZE, i*TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);
-            }
-        }
-
-        for (int i = 1; i < iMax-1; i++) {
-            for (int j = 1; j < jMax-1; j++) {
-                if (m_grid[i][j] != 0) {
-                    Color color = charToColor(m_grid[i][j]);
-                    drawSquare(i,j,TILE_SIZE,color);
-                }
-            }
-        }
-    }
+    void draw(); // Forward declaration, implementation after draw.hpp is included
 
     char getCell(int i, int j) const {
         return m_grid[i][j];
@@ -114,3 +96,26 @@ public:
         return false;
     }
 };
+
+// Include after class definition to avoid circular includes
+#include "draw.hpp"
+
+// Implementation of draw() after draw.hpp is included
+inline void Grid::draw() {
+    // Background grid pattern
+
+    for (int i=0; i<nbRow; i++) {
+        for (int j=0; j<nbCol; j++) {
+            DrawRectangleLines(GRID_X_OFFSET + j*TILE_SIZE, GRID_Y_OFFSET + i*TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);
+        }
+    }
+
+    for (int i = 1; i < iMax-1; i++) {
+        for (int j = 1; j < jMax-1; j++) {
+            if (m_grid[i][j] != 0) {
+                Color color = charToColor(m_grid[i][j]);
+                drawSquareInGrid(i, j, color);
+            }
+        }
+    }
+}
