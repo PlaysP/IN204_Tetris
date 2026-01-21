@@ -33,11 +33,11 @@ int main(void)
     futureTetrominos.push(randomTetromino());
     futureTetrominos.push(randomTetromino());
 
-    KeyPressTimer keyRight(0.12f, KEY_RIGHT);
-    KeyPressTimer keyLeft(0.12f, KEY_LEFT);
-    KeyPressTimer keyDown(0.12f, KEY_DOWN);
+    KeyPressTimer keyRight(0.15f, KEY_RIGHT);
+    KeyPressTimer keyLeft(0.15f, KEY_LEFT);
+    KeyPressTimer keyDown(0.15f, KEY_DOWN);
     KeyPressTimer keyUp(0.20f, KEY_UP);
-    KeyPressTimer keySpace(0.12f, KEY_SPACE);
+    KeyPressTimer keySpace(0.15f, KEY_SPACE);
 
     tetromino t = tetromino(futureTetrominos.front());
     futureTetrominos.pop();
