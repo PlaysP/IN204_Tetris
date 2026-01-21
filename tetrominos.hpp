@@ -51,12 +51,64 @@ private:
     Position position;
     int rotationState = 0;
     char shape;
-
-protected:
     std::map<int, std::vector<Position>> cells;
 
+public:
     // tetromino() : position({1, 1}), rotationState(0), shape(' ') {}
-    tetromino(Position pos, char shape) : position(pos), rotationState(0), shape(shape) {}
+    // tetromino(Position pos, char shape) : position(pos), rotationState(0), shape(shape) {}
+    tetromino(char aShape): shape(aShape) {
+        switch(aShape) {
+        case 'T':
+            position = Position(0, NB_COLS / 2);
+            cells[0] = {Position(0,1), Position(1,0), Position(1,1), Position(1,2)};
+            cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,1)};
+            cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,1)};
+            cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,1)};
+        case 'O':
+            position = Position(0, NB_COLS / 2);
+            cells[0] = {Position(0,0), Position(0,1), Position(1,0), Position(1,1)};
+
+        case 'I':
+            position = Position(0, NB_COLS / 2 - 1);
+            cells[0] = {Position(1,0), Position(1,1), Position(1,2), Position(1,3)};
+            cells[1] = {Position(0,2), Position(1,2), Position(2,2), Position(3,2)};
+            cells[2] = {Position(2,0), Position(2,1), Position(2,2), Position(2,3)};
+            cells[3] = {Position(0,1), Position(1,1), Position(2,1), Position(3,1)};
+
+        case 'J':
+            position = Position(0, NB_COLS / 2);
+            cells[0] = {Position(0,0), Position(1,0), Position(1,1), Position(1,2)};
+            cells[1] = {Position(0,1), Position(0,2), Position(1,1), Position(2,1)};
+            cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,2)};
+            cells[3] = {Position(0,1), Position(1,1), Position(2,0), Position(2,1)};
+
+        case 'L':
+            position = Position(0, NB_COLS / 2);
+            cells[0] = {Position(0,2), Position(1,0), Position(1,1), Position(1,2)};
+            cells[1] = {Position(0,1), Position(1,1), Position(2,1), Position(2,2)};
+            cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,0)};
+            cells[3] = {Position(0,0), Position(0,1), Position(1,1), Position(2,1)};
+
+        case 'S':
+            position = Position(0, NB_COLS / 2);
+            cells[0] = {Position(0,1), Position(0,2), Position(1,0), Position(1,1)};
+            cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,2)};
+            cells[2] = {Position(1,1), Position(1,2), Position(2,0), Position(2,1)};
+            cells[3] = {Position(0,0), Position(1,0), Position(1,1), Position(2,1)};
+
+        case 'Z':
+            position = Position(0, NB_COLS / 2);
+            cells[0] = {Position(0,0), Position(0,1), Position(1,1), Position(1,2)};
+            cells[1] = {Position(0,2), Position(1,1), Position(1,2), Position(2,1)};
+            cells[2] = {Position(1,0), Position(1,1), Position(2,1), Position(2,2)};
+            cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,0)};
+
+        default: // 'O' as default
+            position = Position(0, NB_COLS / 2);
+            cells[0] = {Position(0,1), Position(1,0), Position(1,1), Position(1,2)};
+        }
+    }
+
     tetromino(const tetromino& other) : position(other.position), rotationState(other.rotationState), shape(other.shape) {
         cells = other.cells;
     }
@@ -132,73 +184,5 @@ public:
             int j = position.j + cell.j;
             drawSquare(i, j, TILE_SIZE, charToColor(shapeToChar(shape)));
         }
-    }
-};
-
-class tetromino_T : public tetromino {
-
-    public:
-    tetromino_T(): tetromino({0, NB_COLS/2}, 'T') {
-        cells[0] = {Position(0,1), Position(1,0), Position(1,1), Position(1,2)};
-        cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,1)};
-        cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,1)};
-        cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,1)};
-    }
-};
-
-class tetromino_O : public tetromino {
-    public:
-    tetromino_O(): tetromino({0, NB_COLS/2}, 'O') {
-        cells[0] = {Position(0,0), Position(0,1), Position(1,0), Position(1,1)};
-    }
-};
-
-class tetromino_I : public tetromino {
-    public:
-    tetromino_I(): tetromino({0, NB_COLS/2-1}, 'I') {
-        cells[0] = {Position(1,0), Position(1,1), Position(1,2), Position(1,3)};
-        cells[1] = {Position(0,2), Position(1,2), Position(2,2), Position(3,2)};
-        cells[2] = {Position(2,0), Position(2,1), Position(2,2), Position(2,3)};
-        cells[3] = {Position(0,1), Position(1,1), Position(2,1), Position(3,1)};
-    }
-};
-
-class tetromino_J : public tetromino {
-    public:
-    tetromino_J(): tetromino({0, NB_COLS/2}, 'J') {
-        cells[0] = {Position(0,0), Position(1,0), Position(1,1), Position(1,2)};
-        cells[1] = {Position(0,1), Position(0,2), Position(1,1), Position(2,1)};
-        cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,2)};
-        cells[3] = {Position(0,1), Position(1,1), Position(2,0), Position(2,1)};
-    }
-};
-
-class tetromino_L : public tetromino {
-    public:
-    tetromino_L(): tetromino({0, NB_COLS/2}, 'L') {
-        cells[0] = {Position(0,2), Position(1,0), Position(1,1), Position(1,2)};
-        cells[1] = {Position(0,1), Position(1,1), Position(2,1), Position(2,2)};
-        cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,0)};
-        cells[3] = {Position(0,0), Position(0,1), Position(1,1), Position(2,1)};
-    }
-};
-
-class tetromino_S : public tetromino {
-    public:
-    tetromino_S(): tetromino({0, NB_COLS/2}, 'S') {
-        cells[0] = {Position(0,1), Position(0,2), Position(1,0), Position(1,1)};
-        cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,2)};
-        cells[2] = {Position(1,1), Position(1,2), Position(2,0), Position(2,1)};
-        cells[3] = {Position(0,0), Position(1,0), Position(1,1), Position(2,1)};
-    }
-};
-
-class tetromino_Z : public tetromino {
-    public:
-    tetromino_Z(): tetromino({0, NB_COLS/2}, 'Z') {
-        cells[0] = {Position(0,0), Position(0,1), Position(1,1), Position(1,2)};
-        cells[1] = {Position(0,2), Position(1,1), Position(1,2), Position(2,1)};
-        cells[2] = {Position(1,0), Position(1,1), Position(2,1), Position(2,2)};
-        cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,0)};
     }
 };
