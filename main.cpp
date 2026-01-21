@@ -6,12 +6,12 @@
 #include "timer.hpp"
 #include <queue>
 
-tetromino newTetromino(char shape);
+
 int updateScore(int rowsRemoved, int score, int level);
 int updateLevel(int level, int rowsRemovedCounter);
 char randomTetromino();
 
-float speed[20] = {
+float speed[21] = {
     53.0/60.0f, 49.0/60.0f, 45.0/60.0f, 41.0/60.0f, 37.0/60.0f,
     33.0/60.0f, 28.0/60.0f, 22.0/60.0f, 17.0/60.0f, 11.0/60.0f,
     10.0/60.0f, 9.0/60.0f, 8.0/60.0f, 7.0/60.0f, 6.0/60.0f,
@@ -45,7 +45,9 @@ int main(void)
     KeyPressTimer keyUp(0.2f, KEY_UP);
     KeyPressTimer keySpace(0.2f, KEY_SPACE);
 
-    tetromino_T t;
+    tetromino t = tetromino(futureTetrominos.front());
+    futureTetrominos.pop();
+    futureTetrominos.push(randomTetromino());
     RepeatingTimer fallTimer(speed[level]);
 
     // 1 case : 30x30 pixels
@@ -73,7 +75,7 @@ int main(void)
         if (keySpace.IsPressedAndReady()) {
             // Reset game
             grid.reset();
-            t = tetromino_T();
+            t = tetromino(futureTetrominos.front());
             grounded = false;
             gameOver = false;
         }
@@ -99,7 +101,7 @@ int main(void)
                 }
                 
                 // New tetromino
-                t = newTetromino(futureTetrominos.front());
+                t = tetromino(futureTetrominos.front());
                 futureTetrominos.pop();
                 futureTetrominos.push(randomTetromino());
             }
@@ -133,27 +135,6 @@ int main(void)
 
     return 0;
 } 
-
-
-tetromino newTetromino(char shape){
-    switch(shape) {
-        case 'T':
-            return tetromino_T();
-        case 'O':
-            return tetromino_O();
-        case 'I':
-            return tetromino_I();
-        case 'J':
-            return tetromino_J();
-        case 'L':
-            return tetromino_L();
-        case 'S':
-            return tetromino_S();
-        case 'Z':
-            return tetromino_Z();
-        default:
-            return tetromino_T();}
-}
 
 char shapes[] = {'T', 'O', 'I', 'J', 'L', 'S', 'Z'};
 
