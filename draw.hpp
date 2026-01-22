@@ -45,7 +45,7 @@ inline void drawGameOver() {
     DrawTextEx(GetFontDefault(),"Press space to play", PositionPlay, 20, 2, PINK);
 }
 
-inline void drawBackground(int score, int level, std::queue<char> futureTetrominos); // Forward declaration only
+inline void drawBackground(int score, int level, std::queue<char> futureTetrominos, float backgroundTimer); // Forward declaration only
 
 // Include tetrominos.hpp after class definitions to implement drawBackground
 #include "tetrominos.hpp"
@@ -55,10 +55,22 @@ inline void drawBackground(int score, int level, std::queue<char> futureTetromin
     DrawRectangleGradientH(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ColorBrightness(PINK, -0.7f), ColorBrightness(PURPLE, -0.7f));
     float a = 90.0f;
     float v = 15.0f;
-    float delta = fmod(backgroundTimer * v, a);
-    for (int i=-1; i<SCREEN_WIDTH/a; i++) {
-        for (int j=-1; j<SCREEN_HEIGHT/a; j++) {
-            DrawRectangle(i*a + delta, j*a + delta, a-1, a-1, BLACK);
+    float rawDelta = fmod(backgroundTimer * v, a);
+    int deltaPx = (int)round(rawDelta); // force integer pixel offset to avoid subpixel gaps
+
+    // Calculate how many tiles are needed to cover the screen and add a margin
+    int nx = (int)ceil((float)SCREEN_WIDTH / a) + 2;
+    int ny = (int)ceil((float)SCREEN_HEIGHT / a) + 2;
+
+    // Start offset so the pattern aligns and covers left/top edges.
+    // Use -(a-1) so the first gap (1px) is at x=0 when delta==0,
+    // then shift by delta to animate to the right as delta increases.
+    float startX = -(a - 1) + deltaPx;
+    float startY = -(a - 1) + deltaPx;
+
+    for (int i = 0; i <= nx; ++i) {
+        for (int j = 0; j <= ny; ++j) {
+            DrawRectangle(startX + i * a, startY + j * a, a - 1, a - 1, BLACK);
         }
     }
 
