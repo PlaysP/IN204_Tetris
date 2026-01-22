@@ -1,6 +1,7 @@
 #pragma once
 #include "constant.hpp"
 #include "raylib.h"
+#include <math.h>
 #include <queue>
 
 class tetromino; // forward declaration
@@ -50,8 +51,16 @@ inline void drawBackground(int score, int level, std::queue<char> futureTetromin
 #include "tetrominos.hpp"
 
 // Implementation of drawBackground after tetromino type is complete
-inline void drawBackground(int score, int level, std::queue<char> futureTetrominos) {
-    ClearBackground(BLACK);
+inline void drawBackground(int score, int level, std::queue<char> futureTetrominos, float backgroundTimer) {
+    DrawRectangleGradientH(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ColorBrightness(PINK, -0.7f), ColorBrightness(PURPLE, -0.7f));
+    float a = 90.0f;
+    float v = 15.0f;
+    float delta = fmod(backgroundTimer * v, a);
+    for (int i=-1; i<SCREEN_WIDTH/a; i++) {
+        for (int j=-1; j<SCREEN_HEIGHT/a; j++) {
+            DrawRectangle(i*a + delta, j*a + delta, a-1, a-1, BLACK);
+        }
+    }
 
     // Score and level
     DrawTextEx(GetFontDefault(), TextFormat("Score: %d", score), Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 20}, 20, 2, LIGHTGRAY);

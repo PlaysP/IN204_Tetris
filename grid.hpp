@@ -104,6 +104,8 @@ public:
 inline void Grid::draw() {
     // Background grid pattern
 
+    DrawRectangle(GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT, BLACK);
+
     for (int i=0; i<nbRow; i++) {
         for (int j=0; j<nbCol; j++) {
             DrawRectangleLines(GRID_X_OFFSET + j*TILE_SIZE, GRID_Y_OFFSET + i*TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);

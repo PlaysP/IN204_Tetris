@@ -23,6 +23,8 @@ int main(void)
     Grid grid;
     grid.print();
 
+    float backgroundTimer = 0.0f;
+
     bool grounded = false;
     int score = 0;
     int level = 0;
@@ -121,13 +123,15 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            drawBackground(score, level, futureTetrominos);
+            ClearBackground(BLACK);
+            drawBackground(score, level, futureTetrominos, backgroundTimer);
             grid.draw();
             t.draw();
 
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
+    backgroundTimer += GetFrameTime();
     }
 
     // De-Initialization
