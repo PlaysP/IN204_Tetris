@@ -69,7 +69,11 @@ int main(void)
         if (keySpace.IsPressedAndReady()) {
             // Reset game
             grid.reset();
+
             t = tetromino(futureTetrominos.front());
+            futureTetrominos.pop();
+            futureTetrominos.push(randomTetromino());
+
             grounded = false;
             gameOver = false;
             score = 0;
