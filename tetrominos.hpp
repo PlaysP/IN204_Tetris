@@ -51,6 +51,7 @@ class tetromino {
 private:
     Position position;
     int rotationState = 0;
+    int nbRotationStates;
     char shape;
     std::map<int, std::vector<Position>> cells;
 
@@ -60,6 +61,7 @@ public:
     tetromino(char aShape): shape(aShape) {
         switch(aShape) {
         case 'T': 
+            nbRotationStates = 4;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,1), Position(1,0), Position(1,1), Position(1,2)};
             cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,1)};
@@ -67,10 +69,12 @@ public:
             cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,1)};
             break;
         case 'O':
+            nbRotationStates = 1;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(0,1), Position(1,0), Position(1,1)};
             break;
         case 'I':
+            nbRotationStates = 4;  
             position = Position(0, NB_COLS / 2 - 1);
             cells[0] = {Position(1,0), Position(1,1), Position(1,2), Position(1,3)};
             cells[1] = {Position(0,2), Position(1,2), Position(2,2), Position(3,2)};
@@ -78,6 +82,7 @@ public:
             cells[3] = {Position(0,1), Position(1,1), Position(2,1), Position(3,1)};
             break;
         case 'J':
+            nbRotationStates = 4;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(1,0), Position(1,1), Position(1,2)};
             cells[1] = {Position(0,1), Position(0,2), Position(1,1), Position(2,1)};
@@ -85,6 +90,7 @@ public:
             cells[3] = {Position(0,1), Position(1,1), Position(2,0), Position(2,1)};
             break;
         case 'L':
+            nbRotationStates = 4;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,2), Position(1,0), Position(1,1), Position(1,2)};
             cells[1] = {Position(0,1), Position(1,1), Position(2,1), Position(2,2)};
@@ -92,6 +98,7 @@ public:
             cells[3] = {Position(0,0), Position(0,1), Position(1,1), Position(2,1)};
             break;
         case 'S':
+            nbRotationStates = 4;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,1), Position(0,2), Position(1,0), Position(1,1)};
             cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,2)};
@@ -99,6 +106,7 @@ public:
             cells[3] = {Position(0,0), Position(1,0), Position(1,1), Position(2,1)};
             break;
         case 'Z':
+            nbRotationStates = 4;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(0,1), Position(1,1), Position(1,2)};
             cells[1] = {Position(0,2), Position(1,1), Position(1,2), Position(2,1)};
@@ -106,6 +114,7 @@ public:
             cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,0)};
             break;
         default: // 'O' as default
+            nbRotationStates = 1;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(0,1), Position(1,0), Position(1,1)};
         }
@@ -164,7 +173,7 @@ public:
     }
 
     void rotateClockwise(Grid& grid) {
-        int newRotationState = (rotationState + 1) % 4;
+        int newRotationState = (rotationState + 1) % nbRotationStates;
         std::vector<Position> newCells = cells[newRotationState];
         if (canMoveTo(newCells, position, grid)) {
             rotationState = newRotationState;
@@ -172,7 +181,7 @@ public:
     }
 
     void rotateCounterClockwise(Grid& grid) {
-        int newRotationState = (rotationState + 3) % 4;
+        int newRotationState = (rotationState + nbRotationStates - 1) % nbRotationStates;
         std::vector<Position> newCells = cells[newRotationState];
         if (canMoveTo(newCells, position, grid)) {
             rotationState = newRotationState;
