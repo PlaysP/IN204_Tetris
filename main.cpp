@@ -8,7 +8,7 @@
 
 
 int updateScore(int rowsRemoved, int score, int level);
-int updateLevel(int level, int rowsRemovedCounter);
+int updateLevel(int level, int* rowsRemovedCounter);
 char randomTetromino();
 
 float speed[21] = {
@@ -88,9 +88,9 @@ int main(void)
                 rowsRemovedOnce = grid.removeFilledRows();
                 rowsRemovedCounter += rowsRemovedOnce;
 
-                level = updateLevel(level,rowsRemovedCounter);
+                level = updateLevel(level,&rowsRemovedCounter);
                 score = updateScore(rowsRemovedOnce, score, level);
-                fallTimer.SetInterval(speed[level]);
+                if(level <= 20) fallTimer.SetInterval(speed[level]);
 
                 // Check for game over (after removing filled rows !)
                 if (grid.GameOver()){
@@ -147,9 +147,9 @@ char randomTetromino(){
 }
 
 
-int updateLevel(int level, int rowsRemovedCounter){
-    if(rowsRemovedCounter >=10){
-        rowsRemovedCounter -=10;
+int updateLevel(int level, int* rowsRemovedCounter){
+    if(*rowsRemovedCounter >=10){
+        *rowsRemovedCounter -=10;
         level++;
     }
     return level;
