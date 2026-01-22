@@ -5,9 +5,23 @@
 
 class tetromino; // forward declaration
 
-inline void drawSquare(int x, int y, int size, Color color) {
-    DrawRectangleGradientH(x, y, size, size, color, ColorBrightness(color, -0.3f));
-    DrawRectangleLines(x, y, size, size, BLACK);
+inline void drawSquare(float x, float y, float size, Color color) {
+    // DrawRectangleGradientH(x, y, size, size, color, ColorBrightness(color, -0.3f));
+    // DrawRectangleLines(x, y, size, size, BLACK);
+
+    float effet3D = size/5;
+    // Haut
+    DrawTriangle(Vector2{x,y}, Vector2{x+size/2,y+size/2},Vector2{x+size,y}, ColorBrightness(color, 0.3f));
+    // Gauche
+    DrawTriangle(Vector2{x,y}, Vector2{x,y+size}, Vector2{x+size/2,y+size/2}, ColorBrightness(color, -0.2f));
+    // Droite
+    DrawTriangle(Vector2{x+size,y}, Vector2{x+size/2,y+size/2}, Vector2{x+size,y+size}, ColorBrightness(color, -0.4f));
+    // Bas
+    DrawTriangle(Vector2{x,y+size}, Vector2{x+size,y+size}, Vector2{x+size/2,y+size/2}, ColorBrightness(color, -0.6f));
+    // Centre
+    DrawRectangle(x + effet3D, y + effet3D, size - 2*effet3D, size - 2*effet3D, color);
+    
+
 }
 
 inline void drawSquareInGrid(int i, int j, Color color) {
