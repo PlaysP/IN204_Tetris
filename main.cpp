@@ -116,7 +116,7 @@ int main(void)
                 }
             }
         } // Make the tetromino fall every second
-        if(IsKeyPressed(KEY_SPACE)){t.setPosition(botPos);
+        if(keySpace.IsPressedAndReady()){t.setPosition(botPos);
             fastfall = true;}
         if(keyRight.IsPressedAndReady()){t.moveRight(grid);}
         if(keyLeft.IsPressedAndReady()){t.moveLeft(grid);}
