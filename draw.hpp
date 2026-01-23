@@ -6,10 +6,10 @@
 
 class tetromino; // forward declaration
 
-inline void drawSquare(float x, float y, float size, Color color) {
+inline void drawSquare(float x, float y, float size, Color color,bool transparent = false) {
     // DrawRectangleGradientH(x, y, size, size, color, ColorBrightness(color, -0.3f));
     // DrawRectangleLines(x, y, size, size, BLACK);
-
+    if(transparent)BeginBlendMode(BLEND_ADDITIVE);
     float effet3D = size/5;
     // Haut
     DrawTriangle(Vector2{x,y}, Vector2{x+size/2,y+size/2},Vector2{x+size,y}, ColorBrightness(color, 0.3f));
@@ -21,12 +21,12 @@ inline void drawSquare(float x, float y, float size, Color color) {
     DrawTriangle(Vector2{x,y+size}, Vector2{x+size,y+size}, Vector2{x+size/2,y+size/2}, ColorBrightness(color, -0.6f));
     // Centre
     DrawRectangle(x + effet3D, y + effet3D, size - 2*effet3D, size - 2*effet3D, color);
-    
+    if(transparent)EndBlendMode();
 
 }
 
-inline void drawSquareInGrid(int i, int j, Color color) {
-    drawSquare(GRID_X_OFFSET + (j-1)*TILE_SIZE, GRID_Y_OFFSET + (i-1)*TILE_SIZE, TILE_SIZE, color);
+inline void drawSquareInGrid(int i, int j, Color color, bool transparent) {
+    drawSquare(GRID_X_OFFSET + (j-1)*TILE_SIZE, GRID_Y_OFFSET + (i-1)*TILE_SIZE, TILE_SIZE, color,transparent);
 }
 
 inline void drawGameOver() {

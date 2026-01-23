@@ -116,7 +116,7 @@ inline void Grid::draw() {
         for (int j = 1; j < jMax-1; j++) {
             if (m_grid[i][j] != 0) {
                 Color color = charToColor(m_grid[i][j]);
-                drawSquareInGrid(i, j, color);
+                drawSquareInGrid(i, j, color,false);
             }
         }
     }

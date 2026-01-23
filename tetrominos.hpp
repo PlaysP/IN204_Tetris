@@ -133,6 +133,10 @@ public:
         return shape;
     }
 
+    void setPosition(Position newPosition) {
+        position = newPosition;
+    }
+
     const std::vector<Position>& getCells() const {
         return cells.at(rotationState);
     }
@@ -188,7 +192,15 @@ public:
         }
     }
 
-    void draw(); // Forward declaration, implementation after includes
+    void draw(bool transparent = false, Position transparentPos = Position(0,0)); // Forward declaration, implementation after includes
+
+    Position bottomPosition(Grid& grid){
+        Position testPosition = position;
+        while (canMoveTo(cells[rotationState], testPosition + Position(1,0), grid)) {
+            testPosition += Position(1,0);
+        }
+        return testPosition;
+    }
 };
 
 // Include after class definition to avoid circular includes
@@ -196,13 +208,24 @@ public:
 #include "grid.hpp"
 
 // Implementation of draw() after all includes
-inline void tetromino::draw() {
+inline void tetromino::draw(bool transparent, Position transparentPos) {
     std::vector<Position> currentCells = cells[rotationState];
+    if(transparent){
+        for (const auto& cell : currentCells) {
+        int i = transparentPos.i + cell.i;
+        int j = transparentPos.j + cell.j;
+        if (i > 0) { // do not draw above the grid
+            drawSquareInGrid(i, j, charToColor(shapeToChar(shape)),transparent);
+        }
+    }
+    }
+    else{
     for (const auto& cell : currentCells) {
         int i = position.i + cell.i;
         int j = position.j + cell.j;
         if (i > 0) { // do not draw above the grid
-            drawSquareInGrid(i, j, charToColor(shapeToChar(shape)));
+            drawSquareInGrid(i, j, charToColor(shapeToChar(shape)),transparent);
         }
     }
+}
 }
