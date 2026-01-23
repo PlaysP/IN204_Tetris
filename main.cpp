@@ -65,7 +65,12 @@ int main(void)
     {
     if (gameOver) {
         BeginDrawing();
+
+        ClearBackground(BLACK);
+        drawBackground(score, level, futureTetrominos, backgroundTimer);
+        grid.draw();
         drawGameOver();
+        
         EndDrawing();
 
         if (keySpace.IsPressedAndReady()) {
