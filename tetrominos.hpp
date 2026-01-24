@@ -54,11 +54,12 @@ private:
     int nbRotationStates;
     char shape;
     std::map<int, std::vector<Position>> cells;
+    Position botPos;
 
 public:
     // tetromino() : position({1, 1}), rotationState(0), shape(' ') {}
     // tetromino(Position pos, char shape) : position(pos), rotationState(0), shape(shape) {}
-    tetromino(char aShape): shape(aShape) {
+    tetromino(char aShape, Grid& grid): shape(aShape){
         switch(aShape) {
         case 'T': 
             nbRotationStates = 4;
@@ -67,11 +68,13 @@ public:
             cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,1)};
             cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,1)};
             cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,1)};
+            botPos = bottomPosition(grid);
             break;
         case 'O':
             nbRotationStates = 1;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(0,1), Position(1,0), Position(1,1)};
+            botPos = bottomPosition(grid);
             break;
         case 'I':
             nbRotationStates = 4;  
@@ -80,6 +83,7 @@ public:
             cells[1] = {Position(0,2), Position(1,2), Position(2,2), Position(3,2)};
             cells[2] = {Position(2,0), Position(2,1), Position(2,2), Position(2,3)};
             cells[3] = {Position(0,1), Position(1,1), Position(2,1), Position(3,1)};
+            botPos = bottomPosition(grid);
             break;
         case 'J':
             nbRotationStates = 4;
@@ -88,6 +92,7 @@ public:
             cells[1] = {Position(0,1), Position(0,2), Position(1,1), Position(2,1)};
             cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,2)};
             cells[3] = {Position(0,1), Position(1,1), Position(2,0), Position(2,1)};
+            botPos = bottomPosition(grid);
             break;
         case 'L':
             nbRotationStates = 4;
@@ -96,6 +101,7 @@ public:
             cells[1] = {Position(0,1), Position(1,1), Position(2,1), Position(2,2)};
             cells[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,0)};
             cells[3] = {Position(0,0), Position(0,1), Position(1,1), Position(2,1)};
+            botPos = bottomPosition(grid);
             break;
         case 'S':
             nbRotationStates = 4;
@@ -104,6 +110,7 @@ public:
             cells[1] = {Position(0,1), Position(1,1), Position(1,2), Position(2,2)};
             cells[2] = {Position(1,1), Position(1,2), Position(2,0), Position(2,1)};
             cells[3] = {Position(0,0), Position(1,0), Position(1,1), Position(2,1)};
+            botPos = bottomPosition(grid);
             break;
         case 'Z':
             nbRotationStates = 4;
@@ -112,11 +119,13 @@ public:
             cells[1] = {Position(0,2), Position(1,1), Position(1,2), Position(2,1)};
             cells[2] = {Position(1,0), Position(1,1), Position(2,1), Position(2,2)};
             cells[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,0)};
+            botPos = bottomPosition(grid);
             break;
         default: // 'O' as default
             nbRotationStates = 1;
             position = Position(0, NB_COLS / 2);
             cells[0] = {Position(0,0), Position(0,1), Position(1,0), Position(1,1)};
+            botPos = bottomPosition(grid);
         }
     }
 
@@ -124,7 +133,6 @@ public:
         cells = other.cells;
     }
 
-public:
     Position getPosition() const {
         return position;
     }
@@ -156,6 +164,7 @@ public:
         Position newPosition = position + Position(0, 1);
         if (canMoveTo(cells[rotationState], newPosition, grid)) {
             position = newPosition;
+            botPos = bottomPosition(grid);
         }
     }
 
@@ -163,6 +172,7 @@ public:
         Position newPosition = position + Position(0, -1);
         if (canMoveTo(cells[rotationState], newPosition, grid)) {
             position = newPosition;
+            botPos = bottomPosition(grid);
         }
     }
 
@@ -181,6 +191,7 @@ public:
         std::vector<Position> newCells = cells[newRotationState];
         if (canMoveTo(newCells, position, grid)) {
             rotationState = newRotationState;
+            botPos = bottomPosition(grid);
         }
     }
 
@@ -189,10 +200,11 @@ public:
         std::vector<Position> newCells = cells[newRotationState];
         if (canMoveTo(newCells, position, grid)) {
             rotationState = newRotationState;
+            botPos = bottomPosition(grid);
         }
     }
 
-    void draw(bool transparent = false, Position transparentPos = Position(0,0)); // Forward declaration, implementation after includes
+    void draw(bool transparent = false); // Forward declaration, implementation after includes
 
     Position bottomPosition(Grid& grid){
         Position testPosition = position;
@@ -201,6 +213,10 @@ public:
         }
         return testPosition;
     }
+
+    void fastFall(){
+        position = botPos;
+    }
 };
 
 // Include after class definition to avoid circular includes
@@ -208,24 +224,22 @@ public:
 #include "grid.hpp"
 
 // Implementation of draw() after all includes
-inline void tetromino::draw(bool transparent, Position transparentPos) {
+inline void tetromino::draw(bool transparent) {
     std::vector<Position> currentCells = cells[rotationState];
     if(transparent){
         for (const auto& cell : currentCells) {
-        int i = transparentPos.i + cell.i;
-        int j = transparentPos.j + cell.j;
-        if (i > 0) { // do not draw above the grid
-            drawSquareInGrid(i, j, charToColor(shapeToChar(shape)),transparent);
+        int i = botPos.i + cell.i;
+        int j = botPos.j + cell.j;
+            if (i > 0) { // do not draw above the grid
+                drawSquareInGrid(i, j, charToColor(shapeToChar(shape)), true);
+            }
         }
     }
-    }
-    else{
     for (const auto& cell : currentCells) {
         int i = position.i + cell.i;
         int j = position.j + cell.j;
-        if (i > 0) { // do not draw above the grid
-            drawSquareInGrid(i, j, charToColor(shapeToChar(shape)),transparent);
-        }
+            if (i > 0) { // do not draw above the grid
+                drawSquareInGrid(i, j, charToColor(shapeToChar(shape)), false);
+            }
     }
-}
 }

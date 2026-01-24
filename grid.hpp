@@ -105,6 +105,10 @@ inline void Grid::draw() {
     // Background grid pattern
 
     DrawRectangle(GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT, BLACK);
+    Color bordersColor = ColorBrightness(PINK, -0.3f);
+    DrawRectangleLines(GRID_X_OFFSET-2, GRID_Y_OFFSET-2, GRID_WIDTH+4, GRID_HEIGHT+4, bordersColor);
+    DrawRectangleLines(GRID_X_OFFSET-1, GRID_Y_OFFSET-1, GRID_WIDTH+2, GRID_HEIGHT+2, bordersColor);
+    DrawRectangleLines(GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT, bordersColor);
 
     for (int i=0; i<nbRow; i++) {
         for (int j=0; j<nbCol; j++) {

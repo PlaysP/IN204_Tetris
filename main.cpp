@@ -20,13 +20,14 @@ float speed[21] = {
 };
 
 std::queue<char> futureTetrominos;
-tetromino t = tetromino('T');
+Grid grid;
+tetromino t = tetromino('T', grid);
 int score = 0;
 int level = 0;
+bool EnableBotPos = true;
 int rowsRemovedOnce;
 int rowsRemovedCounter = 0;
 RepeatingTimer fallTimer(speed[level]);
-Grid grid;
 int main(void)
 {
     grid.print();
@@ -36,8 +37,6 @@ int main(void)
     bool fastfall = false;
     bool grounded = false;
 
-    Position botPos;
-
     futureTetrominos.push(randomTetromino());
     futureTetrominos.push(randomTetromino());
 
@@ -45,9 +44,10 @@ int main(void)
     KeyPressTimer keyLeft(0.15f, KEY_LEFT);
     KeyPressTimer keyDown(0.15f, KEY_DOWN);
     KeyPressTimer keyUp(0.20f, KEY_UP);
-    KeyPressTimer keySpace(0.15f, KEY_SPACE);
+    KeyPressTimer keySpace(0.20f, KEY_SPACE);
+    KeyPressTimer keyEnter(0.20f, KEY_ENTER);
 
-    t = tetromino(futureTetrominos.front());
+    t = tetromino(futureTetrominos.front(), grid);
     futureTetrominos.pop();
     futureTetrominos.push(randomTetromino());
 
@@ -72,7 +72,7 @@ int main(void)
         BeginDrawing();
 
         ClearBackground(BLACK);
-        drawBackground(score, level, futureTetrominos, backgroundTimer);
+        drawBackground(score, level, futureTetrominos, backgroundTimer, grid);
         grid.draw();
         drawGameOver();
         
@@ -82,7 +82,7 @@ int main(void)
             // Reset game
             grid.reset();
 
-            t = tetromino(futureTetrominos.front());
+            t = tetromino(futureTetrominos.front(), grid);
             futureTetrominos.pop();
             futureTetrominos.push(randomTetromino());
 
@@ -96,17 +96,12 @@ int main(void)
         keySpace.Update();
 
     } else {
-        if(fastfall){ fastfall = false;
-                    grounded = false;
-                    tetrominoIsGrounded();
-                    if (grid.GameOver()){
-                        gameOver = true;
-                        continue;
-                    }
-                }
-        botPos = t.bottomPosition(grid);
         fallTimer.Update();
-        if (fallTimer.Trigger()) {
+        if (fallTimer.Trigger() || fastfall) {
+            if (fastfall) {
+                fastfall = false;
+                fallTimer.Reset();
+            }
             grounded = t.fall(grid);
             if (grounded) {
                 tetrominoIsGrounded();
@@ -116,26 +111,26 @@ int main(void)
                 }
             }
         } // Make the tetromino fall every second
-        if(keySpace.IsPressedAndReady()){t.setPosition(botPos);
-            fastfall = true;}
+        if(keySpace.IsPressedAndReady()){t.fastFall(); fastfall = true;}
         if(keyRight.IsPressedAndReady()){t.moveRight(grid);}
         if(keyLeft.IsPressedAndReady()){t.moveLeft(grid);}
         if(keyDown.IsPressedAndReady()){fallTimer.SkipToNextTrigger();}
         if(keyUp.IsPressedAndReady()){t.rotateClockwise(grid);}
+        if(keyEnter.IsPressedAndReady()){EnableBotPos = !EnableBotPos;}
 
         keyDown.Update();
         keyLeft.Update();
         keyRight.Update();
         keyUp.Update();
+        keySpace.Update();
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
             ClearBackground(BLACK);
-            drawBackground(score, level, futureTetrominos, backgroundTimer);
-            t.draw(true, botPos);
+            drawBackground(score, level, futureTetrominos, backgroundTimer, grid);
             grid.draw();
-            t.draw();
+            t.draw(EnableBotPos);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
@@ -154,17 +149,17 @@ int main(void)
 
 void tetrominoIsGrounded(){
     grid.placeTetromino(t);
-                rowsRemovedOnce = grid.removeFilledRows();
-                rowsRemovedCounter += rowsRemovedOnce;
+    rowsRemovedOnce = grid.removeFilledRows();
+    rowsRemovedCounter += rowsRemovedOnce;
 
-                level = updateLevel(level,&rowsRemovedCounter);
-                score = updateScore(rowsRemovedOnce, score, level);
-                if(level <= 20) fallTimer.SetInterval(speed[level]);
+    level = updateLevel(level,&rowsRemovedCounter);
+    score = updateScore(rowsRemovedOnce, score, level);
+    if(level <= 20) fallTimer.SetInterval(speed[level]);
 
-                // New tetromino
-                t = tetromino(futureTetrominos.front());
-                futureTetrominos.pop();
-                futureTetrominos.push(randomTetromino());
+    // New tetromino
+    t = tetromino(futureTetrominos.front(), grid);
+    futureTetrominos.pop();
+    futureTetrominos.push(randomTetromino());
 }
 
 char shapes[] = {'T', 'O', 'I', 'J', 'L', 'S', 'Z'};

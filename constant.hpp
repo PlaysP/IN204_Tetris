@@ -10,7 +10,7 @@
 #define GRID_X_OFFSET 30
 #define GRID_Y_OFFSET 30
 
-#define SCREEN_WIDTH (GRID_WIDTH + 2* GRID_X_OFFSET + 150)
+#define SCREEN_WIDTH (GRID_WIDTH + 2* GRID_X_OFFSET + 170)
 #define SCREEN_HEIGHT (GRID_HEIGHT + 2* GRID_Y_OFFSET)
 
 inline Color charToColor(char c) {
