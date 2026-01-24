@@ -95,5 +95,5 @@ inline void drawBackground(int score, int level, std::queue<char> futureTetromin
     DrawTextEx(GetFontDefault(), "UP\n Rotate", Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 310}, 20, 2, LIGHTGRAY);
     DrawTextEx(GetFontDefault(), "DOWN\n Fast Fall", Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 370}, 20, 2, LIGHTGRAY);
     DrawTextEx(GetFontDefault(), "SPACE\n Drop", Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 430}, 20, 2, LIGHTGRAY);
-    DrawTextEx(GetFontDefault(), "ENTER\n Enable/Disable\n Drop Prediction", Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 490}, 20, 2, LIGHTGRAY);
+    DrawTextEx(GetFontDefault(), "ENTER\n Enable/Disable\n Shadow", Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 490}, 20, 2, LIGHTGRAY);
 }
