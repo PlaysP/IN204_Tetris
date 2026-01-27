@@ -1,5 +1,6 @@
-#include<raylib.h>
-#include<iostream>
+#include <raylib.h>
+
+#include <iostream>
 #include <random>
 #include "grid.hpp"
 #include "tetrominos.hpp"
