@@ -95,6 +95,10 @@ public:
         }
         return false;
     }
+
+    std::vector<std::vector<char>>& getGrid() {
+        return m_grid;
+    }
 };
 
 // Include after class definition to avoid circular includes
