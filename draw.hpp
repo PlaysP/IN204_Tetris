@@ -35,7 +35,7 @@ inline void drawMiddle(std::string text) {
     DrawTextEx(GetFontDefault(), text.c_str(), Vector2{SCREEN_WIDTH/2 - textSize.x/2, SCREEN_HEIGHT/2 - textSize.y/2}, 40, 4, PINK);
 }
 
-inline void drawGameOver(std::string message, bool adv) {
+inline void drawGameOver(std::string message, std::string message_bis, bool adv) {
     int effet3D = 3;
     int Adv_offset = adv ? 2*GRID_X_OFFSET + GRID_WIDTH + 170 : 0;
     
@@ -45,11 +45,11 @@ inline void drawGameOver(std::string message, bool adv) {
     DrawTextEx(GetFontDefault(), message.c_str(), Vector2{GRID_X_OFFSET + Adv_offset + GRID_WIDTH/2 - SizeGameOver.x/2,
                                                     GRID_Y_OFFSET + GRID_HEIGHT/2 - SizeGameOver.y/2}, 90, 10, PINK);
 
-    Vector2 SizePlay = MeasureTextEx(GetFontDefault(), "Press space to play", 20, 2);
+    Vector2 SizePlay = MeasureTextEx(GetFontDefault(), message_bis.c_str(), 20, 2);
     Vector2 PositionPlay = Vector2{GRID_X_OFFSET + Adv_offset + GRID_WIDTH/2 - SizePlay.x/2,
                                                     GRID_Y_OFFSET + GRID_HEIGHT/2 + SizeGameOver.y/2 + 10};
     DrawRectangleV(PositionPlay, SizePlay, BLACK);
-    DrawTextEx(GetFontDefault(),"Press space to play", PositionPlay, 20, 2, PINK);
+    DrawTextEx(GetFontDefault(), message_bis.c_str(), PositionPlay, 20, 2, PINK);
 }
 
 inline void drawBackground(int score, int level, std::queue<char> futureTetrominos, float backgroundTimer, Grid& grid); // Forward declaration only
@@ -103,4 +103,18 @@ inline void drawBackground(int score, int level, std::queue<char> futureTetromin
     DrawTextEx(GetFontDefault(), "DOWN\n Fast Fall", Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 370}, 20, 2, LIGHTGRAY);
     DrawTextEx(GetFontDefault(), "SPACE\n Drop", Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 430}, 20, 2, LIGHTGRAY);
     DrawTextEx(GetFontDefault(), "ENTER\n Enable/Disable\n Shadow", Vector2{GRID_X_OFFSET + GRID_WIDTH + 20, GRID_Y_OFFSET + 490}, 20, 2, LIGHTGRAY);
+}
+
+inline void drawAskIP(char* ipAddress) {
+    std::string prompt = "Enter Server IP Address:";
+    Vector2 promptSize = MeasureTextEx(GetFontDefault(), prompt.c_str(), 30, 4);
+    DrawTextEx(GetFontDefault(), prompt.c_str(), Vector2{SCREEN_WIDTH / 2 - promptSize.x / 2, SCREEN_HEIGHT / 2 - 60}, 30, 4, PINK);
+
+    std::string displayIP = std::string(ipAddress) + "_";
+    Vector2 ipSize = MeasureTextEx(GetFontDefault(), displayIP.c_str(), 30, 4);
+    DrawTextEx(GetFontDefault(), displayIP.c_str(), Vector2{SCREEN_WIDTH / 2 - ipSize.x / 2, SCREEN_HEIGHT / 2}, 30, 4, RED);
+
+    std::string instructions = "Press ENTER to connect";
+    Vector2 instrSize = MeasureTextEx(GetFontDefault(), instructions.c_str(), 20, 2);
+    DrawTextEx(GetFontDefault(), instructions.c_str(), Vector2{SCREEN_WIDTH / 2 - instrSize.x / 2, SCREEN_HEIGHT / 2 + 60}, 20, 2, PINK);
 }
