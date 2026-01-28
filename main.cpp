@@ -42,11 +42,11 @@ const float NETWORK_SEND_INTERVAL = 0.1f; // 100ms
 int main()
 {
     // Initialiser ENet une seule fois au démarrage
-    if (enet::enet_initialize() != 0) {
+    if (enet_initialize() != 0) {
         std::cerr << "Failed to initialize ENet" << std::endl;
         return 1;
     }
-    atexit(enet::enet_deinitialize);
+    atexit(enet_deinitialize);
 
     grid.print();
 
@@ -92,7 +92,7 @@ int main()
     bool MultiScreen = false;
     bool Playing = false;
     bool WaitingForClient = false;
-    bool IsServer;
+    bool IsServer = false;  // Initialiser à false par défaut
 
     // Créer le serveur ou client UNE SEULE FOIS avant la boucle
     Server* server = nullptr;
@@ -146,20 +146,40 @@ int main()
         EndDrawing();
 
         if (keyC.IsPressedAndReady()) {
-            IsServer = true;
-            server = new Server("ServeurRayan");
-            server->startReceiving();
-            MultiScreen = false;
-            WaitingForClient = true;
+            std::cout << "Creating server..." << std::endl;
+            try {
+                IsServer = true;
+                std::cout << "Creating Server object..." << std::endl;
+                server = new Server("ServeurRayan");
+                std::cout << "Server object created, starting to receive..." << std::endl;
+                server->startReceiving();
+                std::cout << "Server started successfully!" << std::endl;
+                MultiScreen = false;
+                WaitingForClient = true;
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to create server: " << e.what() << std::endl;
+                IsServer = false;
+                server = nullptr;
+            }
         }
         if (keyJ.IsPressedAndReady()) {
-            IsServer = false;
-            // Demander l'IP
-            // ethernet: "147.250.82.128"
-            client = new Client("ClientRayan", "10.61.137.143");
-            client->startReceiving();
-            MultiScreen = false;
-            Playing = true;
+            std::cout << "Creating client..." << std::endl;
+            try {
+                IsServer = false;
+                // Demander l'IP
+                // ethernet: "147.250.82.128"
+                std::cout << "Connecting to server at 10.61.137.143..." << std::endl;
+                client = new Client("ClientRayan", "10.61.137.143");
+                std::cout << "Client object created, starting to receive..." << std::endl;
+                client->startReceiving();
+                std::cout << "Client started successfully!" << std::endl;
+                MultiScreen = false;
+                Playing = true;
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to create client: " << e.what() << std::endl;
+                IsServer = true;
+                client = nullptr;
+            }
         }
     }
     if (WaitingForClient) {
@@ -176,34 +196,42 @@ int main()
     } 
     if (Playing) {
         // Vérifier si le joueur s'est déconnecté
-        if (Multi && ((!IsServer && client->isServerDisconnected()) || (IsServer && server->isClientDisconnected()))) {
-            BeginDrawing();
-            ClearBackground(BLACK);
-            drawMiddle("Serveur déconnecté !\nAppuyez sur ESPACE pour retourner au menu");
-            EndDrawing();
-            
-            if (keySpace.IsPressedAndReady()) {
-                Playing = false;
-                HomeScreen = true;
-                Multi = false;
-                delete client;
-                client = nullptr;
+        if (Multi && server != nullptr && client != nullptr) {
+            if ((!IsServer && client->isServerDisconnected()) || (IsServer && server->isClientDisconnected())) {
+                BeginDrawing();
+                ClearBackground(BLACK);
+                drawMiddle("Serveur déconnecté !\nAppuyez sur ESPACE pour retourner au menu");
+                EndDrawing();
+                
+                if (keySpace.IsPressedAndReady()) {
+                    Playing = false;
+                    HomeScreen = true;
+                    Multi = false;
+                    if (client != nullptr) {
+                        delete client;
+                        client = nullptr;
+                    }
+                    if (server != nullptr) {
+                        delete server;
+                        server = nullptr;
+                    }
+                }
+                keySpace.Update();
+                continue;
             }
-            keySpace.Update();
-            continue;
         }
         
         if (Multi) {
             networkSendTimer += GetFrameTime();
             if (networkSendTimer >= NETWORK_SEND_INTERVAL) {
-                if (IsServer) server->send(grid, gameOver);
-                else client->send(grid, gameOver);
+                if (IsServer && server != nullptr) server->send(grid, gameOver);
+                else if (!IsServer && client != nullptr) client->send(grid, gameOver);
                 networkSendTimer = 0.0f;
             }
         }
 
-        if (gameOver || ( Multi && IsServer && server->isClientGameOver())
-                    || (Multi && !IsServer && client->isServerGameOver())) {
+        if (gameOver || (Multi && IsServer && server != nullptr && server->isClientGameOver())
+                    || (Multi && !IsServer && client != nullptr && client->isServerGameOver())) {
         // Reste a modifer l'affichage ici pour le game over ou game win
         BeginDrawing();
 
@@ -213,7 +241,7 @@ int main()
         if (gameOver) drawGameOver("Game\nOver", false);
         else drawGameOver("Game\nWin", false);
 
-        if (Multi) {
+        if (Multi && server != nullptr && client != nullptr) {
             advGrid.draw(true);
             if ((IsServer && server->isClientGameOver()) || (!IsServer && client->isServerGameOver())) drawGameOver("Game\nWin", true);
             else drawGameOver("Game\nOver", true);
@@ -269,7 +297,7 @@ int main()
         keyUp.Update();
         keySpace.Update();
 
-        if (Multi) {
+        if (Multi && server != nullptr && client != nullptr) {
             if (IsServer) {
             // Check for received data from client
             if (server->hasReceivedData()) {

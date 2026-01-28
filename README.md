@@ -1,14 +1,14 @@
 # IN204_Tetris
 
-Minimal Tetris project for IN204 course.
+Projet tetris avec une fonction de multijoueur en ligne pour le cours IN204
 
 Build & run
 ------------
 
-Requirements:
-- C++ compiler (g++/clang++) with C++17 support
-- raylib (install via your package manager or from https://www.raylib.com/)
-- pkg-config (optional but recommended)
+Vous aurez besoin de:
+- Compilateur C++ (g++/clang++) qui supporte C++17
+- La librairie graphique raylib (que vous pouvez installer via : https://www.raylib.com/)
+- La librairie réseau enet que vous trouverez ici : https://github.com/zpl-c/enet
 
 Build:
 

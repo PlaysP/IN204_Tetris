@@ -9,13 +9,14 @@
 #include <vector>
 #include <mutex>
 #include <algorithm>
+#include <cstring>
 
 
 class Server {
-    enet::ENetAddress address;
-    std::vector<enet::ENetPeer*> clients;
+    ENetAddress address;
+    std::vector<ENetPeer*> clients;
     std::mutex clients_mutex;
-    enet::ENetHost* server;
+    ENetHost* server;
     std::thread receiverThread;
 
     std::string clientName;
@@ -31,10 +32,13 @@ class Server {
 
 public:
     Server(std::string aClientName): clientName(aClientName), clientGrid(clientGridObj.getGrid()) {
-        address.host = enet::ENET_HOST_ANY;
+        memset(&address, 0, sizeof(address));
+        address.host = ENET_HOST_ANY;
         address.port = ADDRESS_PORT;
+        
+        std::cout << "DEBUG: Creating ENet host..." << std::endl;
 
-        server = enet::enet_host_create(
+        server = enet_host_create(
             &address,
             32, /* max clients */
             2,  /* canaux */
@@ -54,36 +58,36 @@ public:
             receiverThread.join();
         }
         if (server) {
-            enet::enet_host_destroy(server);
+            enet_host_destroy(server);
         }
     };
 
     void startReceiving() {
         receiverThread = std::thread([this]() {
-        enet::ENetEvent event;
+        ENetEvent event;
         while (running) {
             int result = enet_host_service(server, &event, 100);
             if (result > 0) {
                 switch (event.type) {
-                case enet::ENET_EVENT_TYPE_CONNECT: {
+                case ENET_EVENT_TYPE_CONNECT: {
                     std::cout << "Client connecté: " << event.peer << std::endl;
 
                     // Timeout agressif pour détecter les clients morts
-                    enet::enet_peer_timeout(event.peer, 5000, 10000, 30000);
+                    enet_peer_timeout(event.peer, 5000, 10000, 30000);
 
                     std::lock_guard<std::mutex> lock(clients_mutex);
                     clients.push_back(event.peer);
                     break;
                 }
 
-                case enet::ENET_EVENT_TYPE_RECEIVE: {
+                case ENET_EVENT_TYPE_RECEIVE: {
                     deserializeGrid(event.packet->data, event.packet->dataLength, clientGrid, clientGameOver);
                     dataReceived = true;
-                    enet::enet_packet_destroy(event.packet);
+                    enet_packet_destroy(event.packet);
                     break;
                 }
 
-                case enet::ENET_EVENT_TYPE_DISCONNECT:
+                case ENET_EVENT_TYPE_DISCONNECT:
                     std::cout << "Client déconnecté: " << event.peer << std::endl;
                     {
                         std::lock_guard<std::mutex> lock(clients_mutex);
@@ -109,13 +113,13 @@ public:
         if (clients.empty()) {
             return 1;
         } else {
-            for (enet::ENetPeer* peer : clients) {
+            for (ENetPeer* peer : clients) {
                 auto data = serializeGrid(localGrid.getGrid(), localGameOver);
 
-                enet::ENetPacket* packet = enet_packet_create(
+                ENetPacket* packet = enet_packet_create(
                     data.data(),
                     data.size(),
-                    enet::ENET_PACKET_FLAG_RELIABLE );
+                    ENET_PACKET_FLAG_RELIABLE );
                     enet_peer_send(peer, 0, packet);
             }
             enet_host_flush(server);
