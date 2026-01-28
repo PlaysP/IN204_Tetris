@@ -20,7 +20,8 @@ class Server {
 
     std::string clientName;
 
-    std::vector<std::vector<char>>& clientGrid = Grid().getGrid();;
+    Grid clientGridObj;
+    std::vector<std::vector<char>>& clientGrid;
 
     // tetromino& clientTetromino;
 
@@ -29,7 +30,7 @@ class Server {
     bool dataReceived = false;
 
 public:
-    Server(std::string aClientName): clientName(aClientName) {
+    Server(std::string aClientName): clientName(aClientName), clientGrid(clientGridObj.getGrid()) {
         address.host = enet::ENET_HOST_ANY;
         address.port = ADDRESS_PORT;
 
@@ -61,7 +62,8 @@ public:
         receiverThread = std::thread([this]() {
         enet::ENetEvent event;
         while (running) {
-            if (enet_host_service(server, &event, 100) > 0) {
+            int result = enet_host_service(server, &event, 100);
+            if (result > 0) {
                 switch (event.type) {
                 case enet::ENET_EVENT_TYPE_CONNECT: {
                     std::cout << "Client connecté: " << event.peer << std::endl;
@@ -75,7 +77,6 @@ public:
                 }
 
                 case enet::ENET_EVENT_TYPE_RECEIVE: {
-                    std::cout << "Serveur: Données reçues d'un client !" << std::endl;
                     deserializeGrid(event.packet->data, event.packet->dataLength, clientGrid, clientGameOver);
                     dataReceived = true;
                     enet::enet_packet_destroy(event.packet);
@@ -97,6 +98,8 @@ public:
                     break;
                 }
             }
+            // Flush les événements réseau pour éviter le blocage
+            enet_host_flush(server);
         }
     });
     }
@@ -104,7 +107,6 @@ public:
     int send(Grid& localGrid, bool localGameOver) {
         std::lock_guard<std::mutex> lock(clients_mutex);
         if (clients.empty()) {
-            std::cout << "Aucun client connecté" << std::endl;
             return 1;
         } else {
             for (enet::ENetPeer* peer : clients) {
@@ -116,6 +118,7 @@ public:
                     enet::ENET_PACKET_FLAG_RELIABLE );
                     enet_peer_send(peer, 0, packet);
             }
+            enet_host_flush(server);
             return 0;
         }
     }
@@ -138,6 +141,10 @@ public:
 
     int numberOfClients() {
         return clients.size();
+    }
+
+    bool isClientDisconnected() {
+        return clients.empty();
     }
 
 };

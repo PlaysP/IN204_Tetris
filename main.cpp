@@ -140,8 +140,6 @@ int main()
         }
     }
     if (MultiScreen) {
-        std::cout << "MultiScreen\n";
-
         BeginDrawing();
         ClearBackground(BLACK);
         drawMiddle("Press C to Create game\n Press J to Join game");
@@ -157,7 +155,8 @@ int main()
         if (keyJ.IsPressedAndReady()) {
             IsServer = false;
             // Demander l'IP
-            client = new Client("ClientRayan", "147.250.82.128");
+            // ethernet: "147.250.82.128"
+            client = new Client("ClientRayan", "10.61.137.143");
             client->startReceiving();
             MultiScreen = false;
             Playing = true;
@@ -176,7 +175,33 @@ int main()
         }
     } 
     if (Playing) {
-        std::cout << "Playing\n";
+        // Vérifier si le joueur s'est déconnecté
+        if (Multi && ((!IsServer && client->isServerDisconnected()) || (IsServer && server->isClientDisconnected()))) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            drawMiddle("Serveur déconnecté !\nAppuyez sur ESPACE pour retourner au menu");
+            EndDrawing();
+            
+            if (keySpace.IsPressedAndReady()) {
+                Playing = false;
+                HomeScreen = true;
+                Multi = false;
+                delete client;
+                client = nullptr;
+            }
+            keySpace.Update();
+            continue;
+        }
+        
+        if (Multi) {
+            networkSendTimer += GetFrameTime();
+            if (networkSendTimer >= NETWORK_SEND_INTERVAL) {
+                if (IsServer) server->send(grid, gameOver);
+                else client->send(grid, gameOver);
+                networkSendTimer = 0.0f;
+            }
+        }
+
         if (gameOver || ( Multi && IsServer && server->isClientGameOver())
                     || (Multi && !IsServer && client->isServerGameOver())) {
         // Reste a modifer l'affichage ici pour le game over ou game win
@@ -190,7 +215,7 @@ int main()
 
         if (Multi) {
             advGrid.draw(true);
-            if (gameOver) drawGameOver("Game\nWin", true);
+            if ((IsServer && server->isClientGameOver()) || (!IsServer && client->isServerGameOver())) drawGameOver("Game\nWin", true);
             else drawGameOver("Game\nOver", true);
         }
         
@@ -215,15 +240,6 @@ int main()
 
     } else {
         // Game is still playing
-        // Send a message to the server/client (limité à 10 fois par seconde)
-        if (Multi) {
-            networkSendTimer += GetFrameTime();
-            if (networkSendTimer >= NETWORK_SEND_INTERVAL) {
-                if (IsServer) server->send(grid, gameOver);
-                else client->send(grid, gameOver);
-                networkSendTimer = 0.0f;
-            }
-        }
 
         fallTimer.Update();
         if (fallTimer.Trigger() || fastfall) {

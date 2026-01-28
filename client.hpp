@@ -17,16 +17,18 @@ class Client {
 
     std::string serverName;
 
-    std::vector<std::vector<char>> serverGrid = Grid().getGrid();
+    Grid serverGridObj;
+    std::vector<std::vector<char>>& serverGrid;
 
     // tetromino& serverTetromino;
     
     bool serverGameOver = false;
     bool running = true;
     bool dataReceived = false;
+    bool serverDisconnected = false;
 
 public:
-    Client(std::string aServerName, const char* aServerAdress): serverName(aServerName) {
+    Client(std::string aServerName, const char* aServerAdress): serverName(aServerName), serverGrid(serverGridObj.getGrid()) {
     client = enet::enet_host_create(nullptr, 1, 1, 0, 0);
 
     if (!client) {
@@ -64,16 +66,28 @@ public:
 
     void startReceiving() {
         receiverThread = std::thread([this]() {
+        enet::ENetEvent localEvent;
         while (running) {
-            if (enet::enet_host_service(client, &event, 100) > 0) {
-                if (event.type == enet::ENET_EVENT_TYPE_RECEIVE) {
-                    enet::ENetPeer* sender = event.peer;
-                    deserializeGrid(event.packet->data, event.packet->dataLength, serverGrid, serverGameOver);
+            int result = enet::enet_host_service(client, &localEvent, 100);
+            if (result > 0) {
+                switch (localEvent.type) {
+                case enet::ENET_EVENT_TYPE_RECEIVE:
+                    deserializeGrid(localEvent.packet->data, localEvent.packet->dataLength, serverGrid, serverGameOver);
                     dataReceived = true;
-                    // std::cout << "Données reçues du serveur !" << std::endl;
-                    enet::enet_packet_destroy(event.packet);
+                    enet::enet_packet_destroy(localEvent.packet);
+                    break;
+                    
+                case enet::ENET_EVENT_TYPE_DISCONNECT:
+                    std::cout << "Serveur déconnecté !" << std::endl;
+                    serverDisconnected = true;
+                    break;
+                    
+                default:
+                    break;
                 }
             }
+            // Flush les événements réseau pour éviter le blocage
+            enet_host_flush(client);
         }
     });
     }
@@ -86,6 +100,7 @@ public:
             enet::ENET_PACKET_FLAG_RELIABLE
         );
         enet::enet_peer_send(server, 0, packet);
+        enet_host_flush(client);
         return 0;
     }
 
@@ -108,5 +123,9 @@ public:
 
     void resetDataReceived() {
         dataReceived = false;
+    }
+    
+    bool isServerDisconnected() {
+        return serverDisconnected;
     }
 };

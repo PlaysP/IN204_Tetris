@@ -15,8 +15,6 @@ std::vector<uint8_t> serializeGrid(const std::vector<std::vector<char>>& grid, b
     int rows = grid.size();
     int cols = grid.empty() ? 0 : grid[0].size();
 
-    std::cout << "Sérialisation: " << rows << "x" << cols << " octets, gameOver=" << gameOver << std::endl;
-
     // Ajouter dimensions
     buffer.insert(buffer.end(), (uint8_t*)&rows, (uint8_t*)&rows + sizeof(int));
     buffer.insert(buffer.end(), (uint8_t*)&cols, (uint8_t*)&cols + sizeof(int));
@@ -30,7 +28,6 @@ std::vector<uint8_t> serializeGrid(const std::vector<std::vector<char>>& grid, b
         buffer.insert(buffer.end(), row.begin(), row.end());
     }
 
-    std::cout << "Taille du paquet: " << buffer.size() << " octets" << std::endl;
     return buffer;
 }
 
@@ -86,8 +83,6 @@ void deserializeGrid(const uint8_t* data, size_t size,
             ptr++;
         }
     }
-    
-    std::cout << "Grille désérialisée: " << rows << "x" << cols << " octets, gameOver=" << gameOver << std::endl;
 }
 
 
