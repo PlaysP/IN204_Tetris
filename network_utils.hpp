@@ -1,11 +1,13 @@
 #pragma once
 
-#define ENET_FEATURE_ADDRESS_MAPPING
 #include <vector>
 #include <iostream>
 #include "grid.hpp"
 #include <stdint.h>
-#include <enet/enet.h>
+
+namespace enet {
+    #include <enet/enet.h>
+}
 
 std::vector<uint8_t> serializeGrid(const std::vector<std::vector<char>>& grid, bool gameOver) {
     std::vector<uint8_t> buffer;

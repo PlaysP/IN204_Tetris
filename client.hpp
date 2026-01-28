@@ -7,15 +7,12 @@
 #include <map>
 #include <thread>
 #include "network_utils.hpp"
-#include <cstring>
-
-extern "C" int enet_address_set_host_new(ENetAddress * address, const char * hostName);
 
 class Client {
-    ENetAddress address;
-    ENetHost* client;
-    ENetPeer* server;
-    ENetEvent event;
+    enet::ENetAddress address;
+    enet::ENetHost* client;
+    enet::ENetPeer* server;
+    enet::ENetEvent event;
     std::thread receiverThread;
 
     std::string serverName;
@@ -32,14 +29,13 @@ class Client {
 
 public:
     Client(std::string aServerName, const char* aServerAdress): serverName(aServerName), serverGrid(serverGridObj.getGrid()) {
-    memset(&address, 0, sizeof(address));
-    client = enet_host_create(nullptr, 1, 1, 0, 0);
+    client = enet::enet_host_create(nullptr, 1, 1, 0, 0);
 
     if (!client) {
         throw std::runtime_error("Failed to create ENet client host");
     }
 
-    enet_address_set_host_new(&address, aServerAdress);
+    enet::enet_address_set_host(&address, aServerAdress);
     address.port = ADDRESS_PORT;
 
     server = enet_host_connect(client, &address, 2, 0);
@@ -47,8 +43,8 @@ public:
         std::cerr << "Connection failed" << std::endl;
     }
 
-    int serviceResult = enet_host_service(client, &event, 10000);
-    if (serviceResult > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
+    int serviceResult = enet::enet_host_service(client, &event, 10000);
+    if (serviceResult > 0 && event.type == enet::ENET_EVENT_TYPE_CONNECT) {
         std::cout << "Connecté au serveur" << std::endl;
     } else {
         throw std::runtime_error("Timeout connexion");
@@ -61,27 +57,27 @@ public:
             receiverThread.join();
         }
         if (server) {
-            enet_peer_disconnect(server, 0);
+            enet::enet_peer_disconnect(server, 0);
         }
         if (client) {
-            enet_host_destroy(client);
+            enet::enet_host_destroy(client);
         }
     }
 
     void startReceiving() {
         receiverThread = std::thread([this]() {
-        ENetEvent localEvent;
+        enet::ENetEvent localEvent;
         while (running) {
-            int result = enet_host_service(client, &localEvent, 100);
+            int result = enet::enet_host_service(client, &localEvent, 100);
             if (result > 0) {
                 switch (localEvent.type) {
-                case ENET_EVENT_TYPE_RECEIVE:
+                case enet::ENET_EVENT_TYPE_RECEIVE:
                     deserializeGrid(localEvent.packet->data, localEvent.packet->dataLength, serverGrid, serverGameOver);
                     dataReceived = true;
-                    enet_packet_destroy(localEvent.packet);
+                    enet::enet_packet_destroy(localEvent.packet);
                     break;
                     
-                case ENET_EVENT_TYPE_DISCONNECT:
+                case enet::ENET_EVENT_TYPE_DISCONNECT:
                     std::cout << "Serveur déconnecté !" << std::endl;
                     serverDisconnected = true;
                     break;
@@ -98,19 +94,19 @@ public:
     
     int send(Grid& localGrid, bool localGameOver) {
         auto data = serializeGrid(localGrid.getGrid(), localGameOver);
-        ENetPacket* packet = enet_packet_create(
+        enet::ENetPacket* packet = enet::enet_packet_create(
             data.data(),
             data.size(),
-            ENET_PACKET_FLAG_RELIABLE
+            enet::ENET_PACKET_FLAG_RELIABLE
         );
-        enet_peer_send(server, 0, packet);
+        enet::enet_peer_send(server, 0, packet);
         enet_host_flush(client);
         return 0;
     }
 
     void disconnect() {
         running = false;
-        enet_peer_disconnect(server, 0);
+        enet::enet_peer_disconnect(server, 0);
     }
 
     std::vector<std::vector<char>>& getServerGrid() {
