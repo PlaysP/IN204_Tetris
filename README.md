@@ -2,6 +2,8 @@
 
 Projet tetris avec une fonction de multijoueur en ligne pour le cours IN204
 
+<img src="assets/2players.png" alt="example" width="400"/>
+
 ## Pré-requis
 Vous aurez besoin de:
 - Un compilateur C++ (g++/clang++) qui supporte C++17
@@ -73,13 +75,27 @@ Le jeu propose deux modes, un mode à 1 joueur et un mode à 2 joueur en ligne.
 
 Pour jouer en solo, il suffit d'appuyer sur la touche 1 du clavier et la partie se lance.
 
+<img src="assets/homescreen.png" alt="homescreen" width="300"/>
+<img src="assets/1player.png" alt="1player" width="307"/>
+
 ### Mode Multijoueur
 
 Pour jouer en mode multijoueur il faut suivre plusieurs étape :
 
 - Le premier joueur lance le jeu et appuie sur la touche 2 afin d'accéder au mode multijoueur
 - Un deuxième menu s'ouvre, il doit alors appuyer sur la touche C, c'est lui qui jouera le rôle du serveur
+
+<img src="assets/multiscreen.png" alt="multiscreen" width="400"/>
+
 - Le premier joueur est alors en attente du deuxième
+
+<img src="assets/waitingscreen.png" alt="waitingscreen" width="400"/>
+
 - Le deuxième joueur lance le jeu et appuie sur la touche 2
 - Il appuie ensuite sur J pour rejoindre une partie, l'adresse IP du premier joueur lui sera alors demandé
+
+<img src="assets/server_ip.png" alt="server_ip" width="400"/>
+
 - Une fois l'adresse IP renseigné, le joueur 2 rejoins la partie et la partie se lance
+
+<img src="assets/2players.png" alt="2players" width="400"/>
