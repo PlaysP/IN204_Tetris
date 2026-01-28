@@ -231,7 +231,7 @@ inline void tetromino::draw(bool transparent) {
         int i = botPos.i + cell.i;
         int j = botPos.j + cell.j;
             if (i > 0) { // do not draw above the grid
-                drawSquareInGrid(i, j, charToColor(shapeToChar(shape)), true);
+                drawSquareInGrid(i, j, charToColor(shapeToChar(shape)), true, false);
             }
         }
     }
@@ -239,7 +239,7 @@ inline void tetromino::draw(bool transparent) {
         int i = position.i + cell.i;
         int j = position.j + cell.j;
             if (i > 0) { // do not draw above the grid
-                drawSquareInGrid(i, j, charToColor(shapeToChar(shape)), false);
+                drawSquareInGrid(i, j, charToColor(shapeToChar(shape)), false, false);
             }
     }
 }

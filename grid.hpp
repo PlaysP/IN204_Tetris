@@ -39,6 +39,8 @@ public:
             m_grid[i][jMax-1] = 1;
         }
     }
+    Grid(std::vector<std::vector<char>> m_grid): m_grid(m_grid) {}
+
     Grid(const Grid& aGrid): m_grid(aGrid.m_grid) {};
 
     void print() {
@@ -79,7 +81,7 @@ public:
         return rowsRemoved;
     }
 
-    void draw(); // Forward declaration, implementation after draw.hpp is included
+    void draw(bool adv); // Forward declaration, implementation after draw.hpp is included
 
     char getCell(int i, int j) const {
         return m_grid[i][j];
@@ -105,18 +107,24 @@ public:
 #include "draw.hpp"
 
 // Implementation of draw() after draw.hpp is included
-inline void Grid::draw() {
+inline void Grid::draw(bool adv) {
     // Background grid pattern
+    int Adv_offset;
+    if (adv) {
+        Adv_offset = 2*GRID_X_OFFSET + GRID_WIDTH + 170;
+    } else {
+        Adv_offset = 0;
+    }
 
-    DrawRectangle(GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT, BLACK);
+    DrawRectangle(GRID_X_OFFSET + Adv_offset, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT, BLACK);
     Color bordersColor = ColorBrightness(PINK, -0.3f);
-    DrawRectangleLines(GRID_X_OFFSET-2, GRID_Y_OFFSET-2, GRID_WIDTH+4, GRID_HEIGHT+4, bordersColor);
-    DrawRectangleLines(GRID_X_OFFSET-1, GRID_Y_OFFSET-1, GRID_WIDTH+2, GRID_HEIGHT+2, bordersColor);
-    DrawRectangleLines(GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT, bordersColor);
+    DrawRectangleLines(GRID_X_OFFSET-2 + Adv_offset, GRID_Y_OFFSET-2, GRID_WIDTH+4, GRID_HEIGHT+4, bordersColor);
+    DrawRectangleLines(GRID_X_OFFSET-1 + Adv_offset, GRID_Y_OFFSET-1, GRID_WIDTH+2, GRID_HEIGHT+2, bordersColor);
+    DrawRectangleLines(GRID_X_OFFSET + Adv_offset, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT, bordersColor);
 
     for (int i=0; i<nbRow; i++) {
         for (int j=0; j<nbCol; j++) {
-            DrawRectangleLines(GRID_X_OFFSET + j*TILE_SIZE, GRID_Y_OFFSET + i*TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);
+            DrawRectangleLines(GRID_X_OFFSET + Adv_offset + j*TILE_SIZE, GRID_Y_OFFSET + i*TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);
         }
     }
 
@@ -124,7 +132,7 @@ inline void Grid::draw() {
         for (int j = 1; j < jMax-1; j++) {
             if (m_grid[i][j] != 0) {
                 Color color = charToColor(m_grid[i][j]);
-                drawSquareInGrid(i, j, color,false);
+                drawSquareInGrid(i, j, color, false, adv);
             }
         }
     }

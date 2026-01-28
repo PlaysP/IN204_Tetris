@@ -1,4 +1,7 @@
+#pragma once
+
 #include <vector>
+#include <iostream>
 #include "grid.hpp"
 #include <stdint.h>
 
@@ -10,7 +13,9 @@ std::vector<uint8_t> serializeGrid(const std::vector<std::vector<char>>& grid, b
     std::vector<uint8_t> buffer;
 
     int rows = grid.size();
-    int cols = grid[0].size();
+    int cols = grid.empty() ? 0 : grid[0].size();
+
+    std::cout << "Sérialisation: " << rows << "x" << cols << " octets, gameOver=" << gameOver << std::endl;
 
     // Ajouter dimensions
     buffer.insert(buffer.end(), (uint8_t*)&rows, (uint8_t*)&rows + sizeof(int));
@@ -25,6 +30,7 @@ std::vector<uint8_t> serializeGrid(const std::vector<std::vector<char>>& grid, b
         buffer.insert(buffer.end(), row.begin(), row.end());
     }
 
+    std::cout << "Taille du paquet: " << buffer.size() << " octets" << std::endl;
     return buffer;
 }
 
@@ -45,10 +51,29 @@ void deserializeGrid(const uint8_t* data, size_t size,
                      std::vector<std::vector<char>>& grid,
                      bool& gameOver)
 {
+    // Vérifier qu'il y a assez de données
+    if (size < 2 * sizeof(int) + 1) {
+        std::cerr << "Erreur: paquet trop petit (" << size << " octets)" << std::endl;
+        return;
+    }
+
     const uint8_t* ptr = data;
 
     int rows = *(int*)ptr; ptr += sizeof(int);
     int cols = *(int*)ptr; ptr += sizeof(int);
+
+    // Valider les dimensions (limites raisonnables)
+    if (rows < 0 || rows > 1000 || cols < 0 || cols > 1000) {
+        std::cerr << "Erreur: dimensions invalides (rows=" << rows << ", cols=" << cols << ")" << std::endl;
+        return;
+    }
+
+    // Vérifier que le paquet contient assez de données
+    size_t expectedSize = 2 * sizeof(int) + 1 + (rows * cols);
+    if (size < expectedSize) {
+        std::cerr << "Erreur: paquet incomplet (attendu " << expectedSize << ", reçu " << size << ")" << std::endl;
+        return;
+    }
 
     gameOver = (*ptr != 0);
     ptr++;
@@ -61,6 +86,8 @@ void deserializeGrid(const uint8_t* data, size_t size,
             ptr++;
         }
     }
+    
+    std::cout << "Grille désérialisée: " << rows << "x" << cols << " octets, gameOver=" << gameOver << std::endl;
 }
 
 

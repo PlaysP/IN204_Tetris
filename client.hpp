@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include "constant.hpp"
 #include "grid.hpp"
@@ -11,22 +13,20 @@ class Client {
     enet::ENetHost* client;
     enet::ENetPeer* server;
     enet::ENetEvent event;
+    std::thread receiverThread;
 
     std::string serverName;
 
-    std::vector<std::vector<char>> serverGrid;
+    std::vector<std::vector<char>> serverGrid = Grid().getGrid();
 
     // tetromino& serverTetromino;
     
     bool serverGameOver = false;
+    bool running = true;
+    bool dataReceived = false;
 
 public:
-    Client(char* aServerAdress) {
-    if (enet::enet_initialize() != 0) {
-        throw std::runtime_error("Failed to initialize ENet");
-    }
-    atexit(enet::enet_deinitialize);
-
+    Client(std::string aServerName, const char* aServerAdress): serverName(aServerName) {
     client = enet::enet_host_create(nullptr, 1, 1, 0, 0);
 
     if (!client) {
@@ -41,7 +41,7 @@ public:
         std::cerr << "Connection failed" << std::endl;
     }
 
-    int serviceResult = enet_host_service(client, &event, 10000);
+    int serviceResult = enet::enet_host_service(client, &event, 10000);
     if (serviceResult > 0 && event.type == enet::ENET_EVENT_TYPE_CONNECT) {
         std::cout << "Connecté au serveur" << std::endl;
     } else {
@@ -50,26 +50,35 @@ public:
     };
 
     ~Client() {
-        enet::enet_peer_disconnect(server, 0);
-        enet::enet_host_destroy(client);
+        running = false;
+        if (receiverThread.joinable()) {
+            receiverThread.join();
+        }
+        if (server) {
+            enet::enet_peer_disconnect(server, 0);
+        }
+        if (client) {
+            enet::enet_host_destroy(client);
+        }
     }
 
     void startReceiving() {
-        std::thread receiver([this]() {
-        while (true) {
-            if (enet_host_service(client, &event, 100) > 0) {
+        receiverThread = std::thread([this]() {
+        while (running) {
+            if (enet::enet_host_service(client, &event, 100) > 0) {
                 if (event.type == enet::ENET_EVENT_TYPE_RECEIVE) {
                     enet::ENetPeer* sender = event.peer;
                     deserializeGrid(event.packet->data, event.packet->dataLength, serverGrid, serverGameOver);
+                    dataReceived = true;
+                    // std::cout << "Données reçues du serveur !" << std::endl;
                     enet::enet_packet_destroy(event.packet);
                 }
             }
         }
     });
-    receiver.detach();
     }
     
-    void send(Grid& localGrid, bool localGameOver) {
+    int send(Grid& localGrid, bool localGameOver) {
         auto data = serializeGrid(localGrid.getGrid(), localGameOver);
         enet::ENetPacket* packet = enet::enet_packet_create(
             data.data(),
@@ -77,11 +86,12 @@ public:
             enet::ENET_PACKET_FLAG_RELIABLE
         );
         enet::enet_peer_send(server, 0, packet);
+        return 0;
     }
 
     void disconnect() {
+        running = false;
         enet::enet_peer_disconnect(server, 0);
-        enet::enet_host_destroy(client);
     }
 
     std::vector<std::vector<char>>& getServerGrid() {
@@ -91,5 +101,12 @@ public:
     bool isServerGameOver() {
         return serverGameOver;
     }
-    
+
+    bool hasReceivedData() {
+        return dataReceived;
+    }
+
+    void resetDataReceived() {
+        dataReceived = false;
+    }
 };

@@ -25,21 +25,28 @@ inline void drawSquare(float x, float y, float size, Color color, bool transpare
     }
 }
 
-inline void drawSquareInGrid(int i, int j, Color color, bool transparent) {
-    drawSquare(GRID_X_OFFSET + (j-1)*TILE_SIZE, GRID_Y_OFFSET + (i-1)*TILE_SIZE, TILE_SIZE, color, transparent);
+inline void drawSquareInGrid(int i, int j, Color color, bool transparent, bool adv) {
+    int Adv_offset = adv ? 2*GRID_X_OFFSET + GRID_WIDTH + 170 : 0;
+    drawSquare(GRID_X_OFFSET + Adv_offset + (j-1)*TILE_SIZE, GRID_Y_OFFSET + (i-1)*TILE_SIZE, TILE_SIZE, color, transparent);
 }
 
-inline void drawGameOver() {
-    int effet3D = 3;
+inline void drawMiddle(std::string text) {
+    Vector2 textSize = MeasureTextEx(GetFontDefault(), text.c_str(), 40, 4);
+    DrawTextEx(GetFontDefault(), text.c_str(), Vector2{SCREEN_WIDTH/2 - textSize.x/2, SCREEN_HEIGHT/2 - textSize.y/2}, 40, 4, PINK);
+}
 
-    Vector2 SizeGameOver = MeasureTextEx(GetFontDefault(), "Game\nOver", 90, 10);
-    DrawTextEx(GetFontDefault(),"Game\nOver", Vector2{GRID_X_OFFSET + GRID_WIDTH/2 - SizeGameOver.x/2 + effet3D,
+inline void drawGameOver(std::string message, bool adv) {
+    int effet3D = 3;
+    int Adv_offset = adv ? 2*GRID_X_OFFSET + GRID_WIDTH + 170 : 0;
+    
+    Vector2 SizeGameOver = MeasureTextEx(GetFontDefault(), message.c_str(), 90, 10);
+    DrawTextEx(GetFontDefault(), message.c_str(), Vector2{GRID_X_OFFSET + Adv_offset + GRID_WIDTH/2 - SizeGameOver.x/2 + effet3D,
                                                     GRID_Y_OFFSET + GRID_HEIGHT/2 - SizeGameOver.y/2 - effet3D}, 90, 10, MAROON);
-    DrawTextEx(GetFontDefault(),"Game\nOver", Vector2{GRID_X_OFFSET + GRID_WIDTH/2 - SizeGameOver.x/2,
+    DrawTextEx(GetFontDefault(), message.c_str(), Vector2{GRID_X_OFFSET + Adv_offset + GRID_WIDTH/2 - SizeGameOver.x/2,
                                                     GRID_Y_OFFSET + GRID_HEIGHT/2 - SizeGameOver.y/2}, 90, 10, PINK);
 
     Vector2 SizePlay = MeasureTextEx(GetFontDefault(), "Press space to play", 20, 2);
-    Vector2 PositionPlay = Vector2{GRID_X_OFFSET + GRID_WIDTH/2 - SizePlay.x/2,
+    Vector2 PositionPlay = Vector2{GRID_X_OFFSET + Adv_offset + GRID_WIDTH/2 - SizePlay.x/2,
                                                     GRID_Y_OFFSET + GRID_HEIGHT/2 + SizeGameOver.y/2 + 10};
     DrawRectangleV(PositionPlay, SizePlay, BLACK);
     DrawTextEx(GetFontDefault(),"Press space to play", PositionPlay, 20, 2, PINK);
