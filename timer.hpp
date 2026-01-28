@@ -2,7 +2,7 @@
 
 class Timer 
 {
-    // A one-shot timer
+    // un timer à usage unique
     friend class RepeatingTimer;
     float time;
     float interval;
