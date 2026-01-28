@@ -156,7 +156,7 @@ int main()
             IsServer = false;
             // Demander l'IP
             // ethernet: "147.250.82.128"
-            client = new Client("ClientRayan", "10.61.137.143");
+            client = new Client("ClientRayan", "147.250.82.111");
             client->startReceiving();
             MultiScreen = false;
             Playing = true;
