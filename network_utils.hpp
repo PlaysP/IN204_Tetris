@@ -31,19 +31,6 @@ std::vector<uint8_t> serializeGrid(const std::vector<std::vector<char>>& grid, b
     return buffer;
 }
 
-
-// code pour envoyer 
-// auto data = serializeGrid(m_grid, GameOver);
-
-// ENetPacket* packet = enet_packet_create(
-//     data.data(),
-//     data.size(),
-//     ENET_PACKET_FLAG_RELIABLE
-// );
-
-// enet_peer_send(peer, 0, packet);
-
-
 void deserializeGrid(const uint8_t* data, size_t size,
                      std::vector<std::vector<char>>& grid,
                      bool& gameOver)
@@ -84,14 +71,3 @@ void deserializeGrid(const uint8_t* data, size_t size,
         }
     }
 }
-
-
-// reception via enet:
-// if (event.type == ENET_EVENT_TYPE_RECEIVE) {
-//     std::vector<std::vector<char>> grid;
-//     bool gameOver;
-
-//     deserializeGrid(event.packet->data, event.packet->dataLength, grid, gameOver);
-
-//     // Maintenant tu as la grille et le GameOver
-// }

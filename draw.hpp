@@ -6,6 +6,7 @@
 
 class tetromino; // forward declaration
 
+// transparent = true to draw the shadow of the tetromino at its bottom position
 inline void drawSquare(float x, float y, float size, Color color, bool transparent = false) {
     if (transparent) {
         Color transparentGrey = { 128, 128, 128, 150 };
@@ -30,11 +31,13 @@ inline void drawSquareInGrid(int i, int j, Color color, bool transparent, bool a
     drawSquare(GRID_X_OFFSET + Adv_offset + (j-1)*TILE_SIZE, GRID_Y_OFFSET + (i-1)*TILE_SIZE, TILE_SIZE, color, transparent);
 }
 
+// Draw text centered on the screen
 inline void drawMiddle(std::string text) {
     Vector2 textSize = MeasureTextEx(GetFontDefault(), text.c_str(), 40, 4);
     DrawTextEx(GetFontDefault(), text.c_str(), Vector2{SCREEN_WIDTH/2 - textSize.x/2, SCREEN_HEIGHT/2 - textSize.y/2}, 40, 4, PINK);
 }
 
+// Draw Game Over screen with message
 inline void drawGameOver(std::string message, std::string message_bis, bool adv) {
     int effet3D = 3;
     int Adv_offset = adv ? 2*GRID_X_OFFSET + GRID_WIDTH + 170 : 0;
@@ -59,6 +62,7 @@ inline void drawBackground(int score, int level, std::queue<char> futureTetromin
 
 // Implementation of drawBackground after tetromino type is complete
 inline void drawBackground(int score, int level, std::queue<char> futureTetrominos, float backgroundTimer, Grid& grid) {
+    // Animated tiling background
     DrawRectangleGradientH(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ColorBrightness(PINK, -0.5f), ColorBrightness(PURPLE, -0.5f));
     float a = 90.0f;
     float v = 15.0f;

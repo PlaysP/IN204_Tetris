@@ -14,6 +14,7 @@
 class Server {
     enet::ENetAddress address;
     std::vector<enet::ENetPeer*> clients;
+    // Utilisation d'un mutex pour protéger l'accès à la liste des clients entre les threads
     std::mutex clients_mutex;
     enet::ENetHost* server;
     std::thread receiverThread;
@@ -23,7 +24,6 @@ class Server {
     Grid clientGridObj;
     std::vector<std::vector<char>>& clientGrid;
 
-    // tetromino& clientTetromino;
 
     bool clientGameOver;
     bool running = true;
@@ -62,7 +62,7 @@ public:
         receiverThread = std::thread([this]() {
         enet::ENetEvent event;
         while (running) {
-            int result = enet_host_service(server, &event, 100);
+            int result = enet::enet_host_service(server, &event, 100);
             if (result > 0) {
                 switch (event.type) {
                 case enet::ENET_EVENT_TYPE_CONNECT: {
@@ -99,7 +99,7 @@ public:
                 }
             }
             // Flush les événements réseau pour éviter le blocage
-            enet_host_flush(server);
+            enet::enet_host_flush(server);
         }
     });
     }
@@ -112,13 +112,13 @@ public:
             for (enet::ENetPeer* peer : clients) {
                 auto data = serializeGrid(localGrid.getGrid(), localGameOver);
 
-                enet::ENetPacket* packet = enet_packet_create(
+                enet::ENetPacket* packet = enet::enet_packet_create(
                     data.data(),
                     data.size(),
-                    enet::ENET_PACKET_FLAG_RELIABLE );
-                    enet_peer_send(peer, 0, packet);
+                    enet::ENET_PACKET_FLAG_RELIABLE);
+                    enet::enet_peer_send(peer, 0, packet);
             }
-            enet_host_flush(server);
+            enet::enet_host_flush(server);
             return 0;
         }
     }
@@ -140,10 +140,12 @@ public:
     }
 
     int numberOfClients() {
+        std::lock_guard<std::mutex> lock(clients_mutex);
         return clients.size();
     }
 
     bool isClientDisconnected() {
+        std::lock_guard<std::mutex> lock(clients_mutex);
         return clients.empty();
     }
 

@@ -9,22 +9,34 @@
 #include "network_utils.hpp"
 
 class Client {
+    // Adresse du serveur
     enet::ENetAddress address;
+
     enet::ENetHost* client;
     enet::ENetPeer* server;
+
+    // Événement ENet pour la communication (réception/envoi/déconnexion)
     enet::ENetEvent event;
+
+    // Thread pour recevoir les données du serveur
     std::thread receiverThread;
 
+    // Nom du joueur qui est le serveur
     std::string serverName;
 
+    // Grille du serveur reçue (enregistré dans serverGrid, serverGridObj sert juste à son initialisation)
     Grid serverGridObj;
     std::vector<std::vector<char>>& serverGrid;
 
     // tetromino& serverTetromino;
     
     bool serverGameOver = false;
+
+    // Flag pour contrôler le thread de réception
     bool running = true;
+    // Flag indiquant si des données ont été reçues
     bool dataReceived = false;
+    // Flag indiquant si le serveur s'est déconnecté
     bool serverDisconnected = false;
 
 public:
@@ -64,6 +76,8 @@ public:
         }
     }
 
+    // Démarrer le thread de réception des données: génération d'un thread
+    // qui receptionne les données du serveur et des deconnexions en boucle
     void startReceiving() {
         receiverThread = std::thread([this]() {
         enet::ENetEvent localEvent;
@@ -87,7 +101,7 @@ public:
                 }
             }
             // Flush les événements réseau pour éviter le blocage
-            enet_host_flush(client);
+            enet::enet_host_flush(client);
         }
     });
     }
